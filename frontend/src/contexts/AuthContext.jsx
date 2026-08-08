@@ -169,7 +169,7 @@ export const AuthProvider = ({ children }) => {
    */
   const loginWithGoogle = () => {
     // Redirects directly to Spring Boot Google OAuth2 authorization endpoint
-    window.location.href = `${BACKEND_BASE_URL}/oauth2/authorization/google`;
+    window.location.href = `http://localhost:8081/oauth2/authorization/google`;
   };
 
   /**
