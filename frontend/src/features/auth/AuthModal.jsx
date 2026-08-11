@@ -1,41 +1,26 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { LogIn, UserPlus, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/ui/Button';
 
-// Google icon SVG component
-const GoogleIcon = () => (
-  <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-  </svg>
-);
-
-const AuthModal = ({ isOpen, onClose }) => {
+const AuthModal = ({ isOpen, onClose, initialTab = 'login' }) => {
   const { loginWithGoogle } = useAuth();
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleGoogleAuth = async () => {
+  const isRegister = activeTab === 'register';
+
+  const handleGoogleAuth = () => {
     setIsLoading(true);
-    const result = await loginWithGoogle();
-    setIsLoading(false);
-    if (result.success) {
-      // Close modal; navigation to profile can be handled elsewhere based on auth state
-      onClose();
-    } else {
-      // Optionally handle error (e.g., toast) – omitted for brevity
-    }
+    loginWithGoogle(isRegister ? 'register' : 'login');
   };
 
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
-        {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -43,48 +28,79 @@ const AuthModal = ({ isOpen, onClose }) => {
           onClick={onClose}
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
         />
-        {/* Modal container */}
+
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ type: 'spring', duration: 0.3 }}
-          className="relative w-full max-w-md bg-white dark:bg-surface-dark rounded-3xl shadow-2xl border border-slate-200/80 dark:border-surface-border-dark overflow-hidden z-10 my-8"
+          className="relative z-10 my-8 w-full max-w-md overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-surface-border-dark dark:bg-surface-dark"
         >
-          {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors z-20"
+            className="absolute right-5 top-5 rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             aria-label="Close dialog"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
 
-          {/* Header */}
           <div className="p-8 pb-4 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-gradient-to-tr from-terracotta-500 to-terracotta-600 text-white flex items-center justify-center font-serif font-bold text-2xl shadow-glow">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-terracotta-500 to-terracotta-600 font-serif text-2xl font-bold text-white shadow-glow">
               S
             </div>
-            <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-slate-50">
-              Sign In with Google
+            <h2 className="font-serif text-2xl font-bold text-slate-900 dark:text-slate-50">
+              {isRegister ? 'Register with Google' : 'Login with Google'}
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Continue to SkillSwap using your Google account.
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              {isRegister
+                ? 'New users create an account using Google.'
+                : 'Existing users continue using the registered Google account.'}
             </p>
           </div>
 
-          {/* Google button */}
-          <div className="px-8 pb-8">
-            <Button
-              variant="secondary"
-              size="lg"
-              className="w-full justify-center gap-3 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
-              onClick={handleGoogleAuth}
-              leftIcon={<GoogleIcon />}
-              isLoading={isLoading}
+          <div className="mx-8 grid grid-cols-2 rounded-xl bg-slate-100 p-1 text-xs font-semibold dark:bg-slate-900">
+            <button
+              type="button"
+              onClick={() => setActiveTab('register')}
+              className={`rounded-lg px-3 py-2 transition-colors ${
+                isRegister
+                  ? 'bg-white text-terracotta-600 shadow-sm dark:bg-surface-dark dark:text-terracotta-400'
+                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100'
+              }`}
             >
-              Continue with Google
+              Register
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('login')}
+              className={`rounded-lg px-3 py-2 transition-colors ${
+                !isRegister
+                  ? 'bg-white text-terracotta-600 shadow-sm dark:bg-surface-dark dark:text-terracotta-400'
+                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100'
+              }`}
+            >
+              Login
+            </button>
+          </div>
+
+          <div className="space-y-4 p-8">
+            <Button
+              size="lg"
+              className="w-full"
+              isLoading={isLoading}
+              onClick={handleGoogleAuth}
+              leftIcon={isRegister ? <UserPlus className="h-5 w-5" /> : <LogIn className="h-5 w-5" />}
+            >
+              {isRegister ? 'Register with Google' : 'Login with Google'}
             </Button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab(isRegister ? 'login' : 'register')}
+              className="w-full text-center text-xs font-semibold text-terracotta-600 transition-colors hover:text-terracotta-700 dark:text-terracotta-400"
+            >
+              {isRegister ? 'Already registered? Login with Google' : 'New user? Register with Google first'}
+            </button>
           </div>
         </motion.div>
       </div>

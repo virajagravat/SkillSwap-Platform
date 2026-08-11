@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import {
   Sparkles,
   ArrowRight,
@@ -15,12 +15,31 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const { isAuthenticated, isLoading } = useAuth();
+  const toast = useToast();
   const outletContext = useOutletContext();
   const openAuthModal = outletContext?.openAuthModal || (() => {});
+  const handledAuthError = useRef(false);
+
+  // Auto-redirect to dashboard if user is already authenticated
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
+  useEffect(() => {
+    if (location.state?.authError && !handledAuthError.current) {
+      handledAuthError.current = true;
+      toast.warning(location.state.authError);
+      navigate('/', { replace: true });
+    }
+  }, [location.state, navigate, toast]);
 
   const handleHeroCTA = () => {
     if (isAuthenticated) {

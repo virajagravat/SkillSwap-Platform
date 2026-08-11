@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import MainLayout from '../components/layout/MainLayout';
@@ -13,10 +13,21 @@ import ProfilePage from '../pages/ProfilePage';
 import NotFoundPage from '../pages/NotFoundPage';
 import ServerErrorPage from '../pages/ServerErrorPage';
 
+// Google Auth Import
+import OAuthSuccess from '../pages/OAuthSuccess';
+
 // Protected Route Guard
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const outletContext = useOutletContext();
+  const promptedForLogin = useRef(false);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && !promptedForLogin.current) {
+      promptedForLogin.current = true;
+      outletContext?.openAuthModal?.('login');
+    }
+  }, [isAuthenticated, isLoading, outletContext]);
 
   if (isLoading) {
     return (
@@ -27,9 +38,6 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    if (outletContext?.openAuthModal) {
-      outletContext.openAuthModal('login');
-    }
     return <Navigate to="/" replace />;
   }
 
@@ -46,6 +54,8 @@ const AppRoutes = () => {
           <Route index element={<LandingPage />} />
 
           {/* Protected Dashboard & App Routes */}
+          <Route path="oauth-success" element={<OAuthSuccess />} />
+          
           <Route
             path="dashboard"
             element={

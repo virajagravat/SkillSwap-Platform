@@ -41,6 +41,7 @@ const MainLayout = () => {
 
       {/* Global Auth Modal */}
       <AuthModal
+        key={`${isAuthModalOpen}-${authModalTab}`}
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         initialTab={authModalTab}

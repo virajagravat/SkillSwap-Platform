@@ -1,218 +1,199 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from "react";
+
 
 const AuthContext = createContext();
 
-const STORAGE_KEY_USER = 'skillswap_user';
-const STORAGE_KEY_TOKEN = 'skillswap_token';
-const BACKEND_BASE_URL = 'http://localhost:8080';
+const STORAGE_KEY_USER = "skillswap_user";
+const STORAGE_KEY_TOKEN = "skillswap_token";
+
+const BACKEND_BASE_URL = "http://localhost:8085";
+
+const normalizeUser = (backendUser = {}) => ({
+  id: backendUser.id,
+  fullName: backendUser.fullName || "SkillSwap User",
+  email: backendUser.email || "",
+  avatarUrl: backendUser.avatarUrl || backendUser.profilePicture || "",
+  googleId: backendUser.googleId || "",
+  roleName: backendUser.roleName,
+  accountStatusName: backendUser.accountStatusName,
+});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Restore authenticated user session from localStorage
-  useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem(STORAGE_KEY_USER);
-      const savedToken = localStorage.getItem(STORAGE_KEY_TOKEN);
+  // =========================================================
+  // RESTORE SESSION
+  // =========================================================
 
-      if (savedUser && savedToken) {
-        setUser(JSON.parse(savedUser));
-        setToken(savedToken);
+  useEffect(() => {
+    const restoreSession = () => {
+      try {
+        const savedUser = localStorage.getItem(STORAGE_KEY_USER);
+        const savedToken = localStorage.getItem(STORAGE_KEY_TOKEN);
+
+        if (savedUser && savedToken) {
+          setUser(JSON.parse(savedUser));
+          setToken(savedToken);
+        }
+      } catch (error) {
+        console.error("ERROR RESTORING AUTHENTICATION :", error);
+
+        localStorage.removeItem(STORAGE_KEY_USER);
+        localStorage.removeItem(STORAGE_KEY_TOKEN);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error reading authentication token:', error);
-      localStorage.removeItem(STORAGE_KEY_USER);
-      localStorage.removeItem(STORAGE_KEY_TOKEN);
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    restoreSession();
   }, []);
 
-  /**
-   * Real User Login
-   */
-  const login = async ({ email, password, rememberMe = true }) => {
+  // =========================================================
+  // GOOGLE JWT LOGIN
+  // =========================================================
+
+  const loginWithToken = async (jwtToken) => {
     setIsLoading(true);
 
     try {
-      // 1. Try real Spring Boot backend if available
-      try {
-        const response = await fetch(`${BACKEND_BASE_URL}/api/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        });
+      console.log("=================================");
+      console.log("JWT LOGIN STARTED");
+      console.log("=================================");
 
-        if (response.ok) {
-          const data = await response.json();
-          const authenticatedUser = data.user;
-          const jwtToken = data.token;
-
-          setUser(authenticatedUser);
-          setToken(jwtToken);
-
-          if (rememberMe) {
-            localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(authenticatedUser));
-            localStorage.setItem(STORAGE_KEY_TOKEN, jwtToken);
-          }
-          return { success: true, user: authenticatedUser };
-        }
-      } catch (backendError) {
-        // Spring Boot backend offline, fallback to real client registration registry
+      if (!jwtToken) {
+        throw new Error("JWT token is missing");
       }
 
-      // 2. Real user lookup in local registered users database
-      const storedUsers = JSON.parse(localStorage.getItem('skillswap_registered_users') || '[]');
-      const existingUser = storedUsers.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+      // Save JWT immediately
+      localStorage.setItem(STORAGE_KEY_TOKEN, jwtToken);
+      setToken(jwtToken);
+      console.log("JWT SAVED");
+
+      // Fetch authenticated user data from backend database
+      console.log("CALLING BACKEND /api/users/me ...");
+
+      const response = await fetch(`${BACKEND_BASE_URL}/api/users/me`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+      });
+
+      console.log("USER API STATUS :", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("USER API ERROR :", errorText);
+        throw new Error(
+          `Failed to load authenticated user. Status: ${response.status}`
+        );
+      }
+
+      const backendUser = await response.json();
+      console.log("BACKEND USER DATA :", backendUser);
+
+      // Map backend User entity fields to frontend user object
+      const authenticatedUser = normalizeUser(backendUser);
+
+      setUser(authenticatedUser);
+      localStorage.setItem(
+        STORAGE_KEY_USER,
+        JSON.stringify(authenticatedUser)
       );
 
-      if (!existingUser) {
-        const userExistsByEmail = storedUsers.some((u) => u.email.toLowerCase() === email.toLowerCase());
-        if (userExistsByEmail) {
-          throw new Error('Invalid password. Please check your credentials.');
-        } else {
-          throw new Error('No account found with this email address. Please sign up first.');
-        }
-      }
+      console.log("GOOGLE LOGIN SUCCESS :", authenticatedUser);
 
-      const jwtToken = 'jwt_' + btoa(existingUser.email + ':' + Date.now());
-
-      setUser(existingUser);
-      setToken(jwtToken);
-
-      if (rememberMe) {
-        localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(existingUser));
-        localStorage.setItem(STORAGE_KEY_TOKEN, jwtToken);
-      }
-
-      return { success: true, user: existingUser };
-    } catch (error) {
-      return { success: false, message: error.message || 'Authentication failed' };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
-   * Real User Registration
-   */
-  const register = async (userData) => {
-    setIsLoading(true);
-
-    try {
-      // 1. Try real Spring Boot backend if available
-      try {
-        const response = await fetch(`${BACKEND_BASE_URL}/api/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(userData),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data.user);
-          setToken(data.token);
-          localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(data.user));
-          localStorage.setItem(STORAGE_KEY_TOKEN, data.token);
-          return { success: true, user: data.user };
-        }
-      } catch (backendError) {
-        // Backend offline, save into real user registry
-      }
-
-      // 2. Client registration store
-      const storedUsers = JSON.parse(localStorage.getItem('skillswap_registered_users') || '[]');
-      const emailExists = storedUsers.some((u) => u.email.toLowerCase() === userData.email.toLowerCase().trim());
-
-      if (emailExists) {
-        throw new Error('An account with this email address already exists.');
-      }
-
-      const newUser = {
-        id: 'usr_' + Date.now(),
-        fullName: userData.fullName.trim(),
-        email: userData.email.toLowerCase().trim(),
-        password: userData.password,
-        avatarUrl: userData.avatarUrl || '',
-        role: 'USER',
-        skillsToTeach: userData.skillsToTeach ? userData.skillsToTeach.split(',').map((s) => s.trim()).filter(Boolean) : [],
-        skillsToLearn: userData.skillsToLearn ? userData.skillsToLearn.split(',').map((s) => s.trim()).filter(Boolean) : [],
-        bio: userData.bio || '',
-        rating: 5.0,
-        swapsCompleted: 0,
-        createdAt: new Date().toISOString(),
+      return {
+        success: true,
+        user: authenticatedUser,
       };
-
-      storedUsers.push(newUser);
-      localStorage.setItem('skillswap_registered_users', JSON.stringify(storedUsers));
-
-      const jwtToken = 'jwt_' + btoa(newUser.email + ':' + Date.now());
-
-      setUser(newUser);
-      setToken(jwtToken);
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(newUser));
-      localStorage.setItem(STORAGE_KEY_TOKEN, jwtToken);
-
-      return { success: true, user: newUser };
     } catch (error) {
-      return { success: false, message: error.message || 'Registration failed' };
+      console.error("JWT LOGIN ERROR :", error);
+
+      localStorage.removeItem(STORAGE_KEY_TOKEN);
+      localStorage.removeItem(STORAGE_KEY_USER);
+
+      setToken(null);
+      setUser(null);
+
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  /**
-   * Google OAuth2 Redirect
-   */
-  const loginWithGoogle = () => {
-    // Redirects directly to Spring Boot Google OAuth2 authorization endpoint
-    window.location.href = `http://localhost:8081/oauth2/authorization/google`;
-  };
+  // =========================================================
+  // GOOGLE OAUTH2
+  // =========================================================
 
-  /**
-   * Log Out User
-   */
+const loginWithGoogle = (mode = "login") => {
+  console.log("REDIRECTING TO GOOGLE LOGIN");
+
+  window.location.assign(
+    `${BACKEND_BASE_URL}/api/oauth2/${mode}/google`
+  );
+};
+
+  // =========================================================
+  // LOGOUT
+  // =========================================================
+
   const logout = () => {
     setUser(null);
     setToken(null);
+
     localStorage.removeItem(STORAGE_KEY_USER);
     localStorage.removeItem(STORAGE_KEY_TOKEN);
   };
 
-  /**
-   * Update User Profile
-   */
+  // =========================================================
+  // UPDATE PROFILE
+  // =========================================================
+
   const updateProfile = async (updatedFields) => {
-    if (!user) return;
-    const updatedUser = { ...user, ...updatedFields };
+    if (!user || !token) return;
+
+    const updatedUser = {
+      ...user,
+      ...updatedFields,
+    };
 
     try {
-      await fetch(`${BACKEND_BASE_URL}/api/users/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedUser),
-      });
-    } catch (err) {
-      // Backend offline fallback
-    }
+      const response = await fetch(
+        `${BACKEND_BASE_URL}/api/users/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updatedUser),
+          mode: "cors",
+        }
+      );
 
-    setUser(updatedUser);
-    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updatedUser));
+      if (!response.ok) {
+        throw new Error("Profile update failed");
+      }
 
-    // Update in user store as well
-    const storedUsers = JSON.parse(localStorage.getItem('skillswap_registered_users') || '[]');
-    const index = storedUsers.findIndex((u) => u.id === user.id);
-    if (index !== -1) {
-      storedUsers[index] = updatedUser;
-      localStorage.setItem('skillswap_registered_users', JSON.stringify(storedUsers));
+      setUser(updatedUser);
+
+      localStorage.setItem(
+        STORAGE_KEY_USER,
+        JSON.stringify(updatedUser)
+      );
+    } catch (error) {
+      console.error("PROFILE UPDATE ERROR :", error);
     }
   };
+
+  // =========================================================
+  // CONTEXT VALUE
+  // =========================================================
 
   return (
     <AuthContext.Provider
@@ -221,9 +202,13 @@ export const AuthProvider = ({ children }) => {
         token,
         isAuthenticated: !!user,
         isLoading,
-        login,
-        register,
+
         loginWithGoogle,
+
+        // JWT authentication
+        loginWithToken,
+
+        // Other
         logout,
         updateProfile,
       }}
@@ -233,10 +218,18 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// =========================================================
+// useAuth Hook
+// =========================================================
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
+
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error(
+      "useAuth must be used within an AuthProvider"
+    );
   }
+
   return context;
 };
