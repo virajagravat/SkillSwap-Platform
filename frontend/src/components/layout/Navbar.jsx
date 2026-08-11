@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -7,11 +7,10 @@ import {
   LogOut,
   User,
   Menu,
-  X,
   Bell,
-  Sparkles,
   ChevronDown,
-  LogIn
+  LogIn,
+  UserPlus
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -163,17 +162,19 @@ const Navbar = ({ onOpenMobileSidebar, onOpenAuthModal }) => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onOpenAuthModal('login')}
-                leftIcon={<LogIn className="w-4 h-4" />}
+                onClick={() => onOpenAuthModal('register')}
+                leftIcon={<UserPlus className="w-4 h-4" />}
+                className="hidden sm:inline-flex"
               >
-                Log In
+                Register
               </Button>
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => onOpenAuthModal('register')}
+                onClick={() => onOpenAuthModal('login')}
+                leftIcon={<LogIn className="w-4 h-4" />}
               >
-                Sign Up
+                Login
               </Button>
             </div>
           )}
