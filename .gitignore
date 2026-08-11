@@ -1,2 +1,4 @@
 .env
 target/
+backend/auth-service/src/main/resources/application.properties backend/auth-service/src/main/resources/application.properties
+backend/auth-service/src/main/resources/
