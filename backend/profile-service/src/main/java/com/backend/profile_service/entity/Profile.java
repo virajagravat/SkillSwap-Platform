@@ -18,10 +18,10 @@ public class Profile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "user_id", nullable = false , unique = true)
-    private long userId;
+    private Long userId;
 
     @Column(nullable = false)
     private String name;
