@@ -39,6 +39,12 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
+    public void deleteProfile(Long id) {
+        Profile profile = profileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Profile not found with id: " + id));
+
+        profileRepository.delete(profile);
+    }
 
 
 }
