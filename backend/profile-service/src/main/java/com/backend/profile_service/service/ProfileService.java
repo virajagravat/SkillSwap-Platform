@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import com.backend.profile_service.exception.ProfileNotFoundException;
 import java.util.List;
 import com.backend.profile_service.dto.ProfileResponse;
+import com.backend.profile_service.dto.CreateProfileRequest;
+import com.backend.profile_service.dto.UpdateProfileRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -34,19 +36,26 @@ public class ProfileService {
     }
 
     //Create Profile
-    public ProfileResponse createProfile(Profile profile){
+    public ProfileResponse createProfile(CreateProfileRequest request){
+
+        Profile profile = new Profile();
+
+        profile.setUserId(request.getUserId());
+        profile.setName(request.getName());
+        profile.setProfilePhoto(request.getProfilePhoto());
+
         Profile savedProfile = profileRepository.save(profile);
 
         return mapToResponse(savedProfile);
     }
 
     //Update Profile
-    public ProfileResponse updateProfile(Long id, String name, String profilePhoto){
+    public ProfileResponse updateProfile(Long id, UpdateProfileRequest request){
         Profile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new ProfileNotFoundException("Profile not found with id: " + id));
 
-        profile.setName(name);
-        profile.setProfilePhoto(profilePhoto);
+        profile.setName(request.getName());
+        profile.setProfilePhoto(request.getProfilePhoto());
 
         Profile savedProfile = profileRepository.save(profile);
 

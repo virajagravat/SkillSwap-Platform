@@ -1,9 +1,11 @@
 package com.backend.profile_service.controller;
 
-
+import com.backend.profile_service.dto.CreateProfileRequest;
 import com.backend.profile_service.dto.ProfileResponse;
+import com.backend.profile_service.dto.UpdateProfileRequest;
 import com.backend.profile_service.entity.Profile;
 import com.backend.profile_service.service.ProfileService;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +33,10 @@ public class ProfileController {
 
     //Create profile
     @PostMapping
-    public ProfileResponse createProfile(@RequestBody Profile profile) {
-        return profileService.createProfile(profile);
+    public ProfileResponse createProfile(
+            @Valid @RequestBody CreateProfileRequest request) {
+
+        return profileService.createProfile(request);
     }
 
 
@@ -40,13 +44,9 @@ public class ProfileController {
     @PutMapping("/{id}")
     public ProfileResponse updateProfile(
             @PathVariable Long id,
-            @RequestBody Profile profile) {
+            @Valid @RequestBody UpdateProfileRequest request) {
 
-        return profileService.updateProfile(
-                id,
-                profile.getName(),
-                profile.getProfilePhoto()
-        );
+        return profileService.updateProfile(id, request);
     }
 
     //Delete profile
