@@ -3,6 +3,8 @@ package com.backend.profile_service.service;
 import com.backend.profile_service.entity.Skill;
 import com.backend.profile_service.repository.SkillRepository;
 import org.springframework.stereotype.Service;
+import com.backend.profile_service.dto.CreateSkillRequest;
+
 
 import java.util.List;
 
@@ -17,4 +19,14 @@ public class SkillService {
     public  List<Skill> searchSkills(String query) {
         return skillRepository.findByNameContainingIgnoreCase(query);
     }
+
+    public Skill createSkill(CreateSkillRequest request) {
+
+        Skill skill = new Skill();
+
+        skill.setName(request.getName());
+
+        return skillRepository.save(skill);
+    }
 }
+
