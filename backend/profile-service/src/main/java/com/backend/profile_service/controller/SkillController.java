@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.profile_service.dto.CreateSkillRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.validation.Valid;
 
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class SkillController {
     }
 
     @PostMapping
-    public Skill createSkill(@RequestBody CreateSkillRequest request) {
+    public Skill createSkill(@Valid @RequestBody CreateSkillRequest request){
         return skillService.createSkill(request);
     }
 }
