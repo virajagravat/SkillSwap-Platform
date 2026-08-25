@@ -32,4 +32,12 @@ public class ProfileSkillController {
         );
     }
 
+    @DeleteMapping("/{profileId}/skills/{skillId}")
+    public void removeSkillFromProfile(
+            @PathVariable Long profileId,
+            @PathVariable Long skillId) {
+
+        profileSkillService.removeSkillFromProfile(profileId, skillId);
+    }
+
 }

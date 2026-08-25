@@ -9,6 +9,7 @@ import com.backend.profile_service.repository.ProfileSkillRepository;
 import com.backend.profile_service.repository.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -64,13 +65,14 @@ public class ProfileSkillService {
         return profileSkillRepository.findByProfileId(profileId);
     }
 
+    @Transactional
     public void removeSkillFromProfile(Long profileId, Long skillId) {
 
         profileRepository.findById(profileId)
                 .orElseThrow(() ->
                         new RuntimeException("Profile not found with id: " + profileId));
 
-        Skill skill = skillRepository.findById(skillId)
+        skillRepository.findById(skillId)
                 .orElseThrow(() ->
                         new RuntimeException("Skill not found with id: " + skillId));
 
