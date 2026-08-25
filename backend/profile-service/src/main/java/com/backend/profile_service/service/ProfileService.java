@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.backend.profile_service.exception.ProfileNotFoundException;
 import java.util.List;
+import com.backend.profile_service.dto.ProfileResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -14,30 +15,42 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
 
     //Search Profile by id
-    public Profile getProfileById(Long id){
-        return profileRepository.findById(id)
-                .orElseThrow(()-> new ProfileNotFoundException("Profile not found with id: " + id ));
+    public ProfileResponse getProfileById(Long id) {
+
+        Profile profile = profileRepository.findById(id)
+                .orElseThrow(() ->
+                        new ProfileNotFoundException(
+                                "Profile not found with id: " + id));
+
+        return mapToResponse(profile);
     }
 
     //Get All Profile
-    public List<Profile> getAllProfile(){
-        return profileRepository.findAll();
+    public List<ProfileResponse> getAllProfile() {
+        return profileRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     //Create Profile
-    public Profile createProfile(Profile profile){
-        return profileRepository.save(profile);
+    public ProfileResponse createProfile(Profile profile){
+        Profile savedProfile = profileRepository.save(profile);
+
+        return mapToResponse(savedProfile);
     }
 
     //Update Profile
-    public Profile updateProfile(Long id, String name, String profilePhoto){
+    public ProfileResponse updateProfile(Long id, String name, String profilePhoto){
         Profile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new ProfileNotFoundException("Profile not found with id: " + id));
 
         profile.setName(name);
         profile.setProfilePhoto(profilePhoto);
 
-        return profileRepository.save(profile);
+        Profile savedProfile = profileRepository.save(profile);
+
+        return mapToResponse(savedProfile);
     }
 
     public void deleteProfile(Long id) {
@@ -45,6 +58,19 @@ public class ProfileService {
                 .orElseThrow(() -> new ProfileNotFoundException("Profile not found with id: " + id));
 
         profileRepository.delete(profile);
+    }
+
+    private ProfileResponse mapToResponse(Profile profile) {
+        ProfileResponse response = new ProfileResponse();
+
+        response.setId(profile.getId());
+        response.setUserId(profile.getUserId());
+        response.setName(profile.getName());
+        response.setProfilePhoto(profile.getProfilePhoto());
+        response.setCreatedAt(profile.getCreatedAt());
+        response.setUpdatedAt(profile.getUpdatedAt());
+
+        return response;
     }
 
 
