@@ -4,6 +4,7 @@ import com.backend.profile_service.entity.Profile;
 import com.backend.profile_service.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.backend.profile_service.exception.ProfileNotFoundException;
 import java.util.List;
 
 @Service
@@ -15,7 +16,7 @@ public class ProfileService {
     //Search Profile by id
     public Profile getProfileById(Long id){
         return profileRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Profile not found with id: " + id ));
+                .orElseThrow(()-> new ProfileNotFoundException("Profile not found with id: " + id ));
     }
 
     //Get All Profile
@@ -31,7 +32,7 @@ public class ProfileService {
     //Update Profile
     public Profile updateProfile(Long id, String name, String profilePhoto){
         Profile profile = profileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Profile not found with id: " + id));
+                .orElseThrow(() -> new ProfileNotFoundException("Profile not found with id: " + id));
 
         profile.setName(name);
         profile.setProfilePhoto(profilePhoto);
@@ -41,7 +42,7 @@ public class ProfileService {
 
     public void deleteProfile(Long id) {
         Profile profile = profileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Profile not found with id: " + id));
+                .orElseThrow(() -> new ProfileNotFoundException("Profile not found with id: " + id));
 
         profileRepository.delete(profile);
     }

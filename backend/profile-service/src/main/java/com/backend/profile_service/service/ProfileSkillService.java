@@ -10,6 +10,10 @@ import com.backend.profile_service.repository.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.backend.profile_service.exception.ProfileNotFoundException;
+import com.backend.profile_service.exception.SkillNotFoundException;
+import com.backend.profile_service.exception.SkillAlreadyExistsException;
+import com.backend.profile_service.exception.SkillNotAssociatedException;
 
 import java.util.List;
 
@@ -29,11 +33,11 @@ public class ProfileSkillService {
 
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() ->
-                        new RuntimeException("Profile not found with id: " + profileId));
+                        new ProfileNotFoundException("Profile not found with id: " + profileId));
 
         Skill skill = skillRepository.findById(skillId)
                 .orElseThrow(() ->
-                        new RuntimeException("Skill not found with id: " + skillId));
+                        new SkillNotFoundException("Skill not found with id: " + skillId));
 
         boolean exists = profileSkillRepository
                 .existsByProfileIdAndSkillIdAndSkillType(
@@ -43,7 +47,7 @@ public class ProfileSkillService {
                 );
 
         if (exists) {
-            throw new RuntimeException(
+            throw new SkillAlreadyExistsException(
                     "Skill already exists for this profile with type: " + skillType
             );
         }
@@ -93,7 +97,7 @@ public class ProfileSkillService {
         }
 
         if (!exists) {
-            throw new RuntimeException(
+            throw new SkillNotAssociatedException(
                     "Skill is not associated with this profile"
             );
         }

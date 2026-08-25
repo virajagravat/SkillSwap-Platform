@@ -4,6 +4,8 @@ import com.backend.profile_service.entity.Skill;
 import com.backend.profile_service.repository.SkillRepository;
 import org.springframework.stereotype.Service;
 import com.backend.profile_service.dto.CreateSkillRequest;
+import com.backend.profile_service.exception.SkillAlreadyExistsException;
+
 
 
 import java.util.List;
@@ -21,6 +23,13 @@ public class SkillService {
     }
 
     public Skill createSkill(CreateSkillRequest request) {
+
+        skillRepository.findByNameIgnoreCase(request.getName())
+                .ifPresent(skill -> {
+                    throw new SkillAlreadyExistsException(
+                            "Skill already exists with name: " + request.getName()
+                    );
+                });
 
         Skill skill = new Skill();
 
