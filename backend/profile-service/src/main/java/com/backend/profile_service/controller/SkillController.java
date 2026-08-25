@@ -1,0 +1,25 @@
+package com.backend.profile_service.controller;
+
+
+import com.backend.profile_service.entity.Skill;
+import com.backend.profile_service.service.SkillService;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/skills")
+@AllArgsConstructor
+public class SkillController {
+
+    private final SkillService skillService;
+
+    @GetMapping("/search")
+    public List<Skill> searchSkills(@RequestParam String query) {
+        return skillService.searchSkills(query);
+    }
+}
