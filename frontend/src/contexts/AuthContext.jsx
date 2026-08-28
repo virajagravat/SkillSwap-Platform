@@ -1,12 +1,20 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-
 const AuthContext = createContext();
 
 const STORAGE_KEY_USER = "skillswap_user";
 const STORAGE_KEY_TOKEN = "skillswap_token";
 
 const BACKEND_BASE_URL = "http://localhost:8085";
+const PROFILE_SERVICE_BASE_URL = "http://localhost:8088";
+
+const getFullPhotoUrl = (photoPath) => {
+  if (!photoPath) return null;
+  if (photoPath.startsWith("http://") || photoPath.startsWith("https://")) {
+    return photoPath;
+  }
+  return `${PROFILE_SERVICE_BASE_URL}/uploads/profiles/${photoPath}`;
+};
 
 const normalizeUser = (backendUser = {}) => ({
   id: backendUser.id,
@@ -23,19 +31,48 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Helper to fetch latest custom profile from profile-service (Port 8088)
+  const syncWithProfileService = async (userId, initialUser) => {
+    if (!userId) return;
+    try {
+      const res = await fetch(`${PROFILE_SERVICE_BASE_URL}/api/profiles/user/${userId}`);
+      if (res.ok) {
+        const pData = await res.json();
+        if (pData && pData.name) {
+          setUser((prev) => {
+            const baseUser = prev || initialUser;
+            if (!baseUser) return null;
+            const updated = {
+              ...baseUser,
+              fullName: pData.name || baseUser.fullName,
+              avatarUrl: getFullPhotoUrl(pData.profilePhoto) || baseUser.avatarUrl,
+            };
+            localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(updated));
+            return updated;
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("Could not sync profile-service user data:", err);
+    }
+  };
+
   // =========================================================
   // RESTORE SESSION
   // =========================================================
 
   useEffect(() => {
-    const restoreSession = () => {
+    const restoreSession = async () => {
       try {
         const savedUser = localStorage.getItem(STORAGE_KEY_USER);
         const savedToken = localStorage.getItem(STORAGE_KEY_TOKEN);
 
         if (savedUser && savedToken) {
-          setUser(JSON.parse(savedUser));
+          const parsedUser = JSON.parse(savedUser);
+          setUser(parsedUser);
           setToken(savedToken);
+          // Sync custom name/photo from profile-service in background
+          syncWithProfileService(parsedUser.id, parsedUser);
         }
       } catch (error) {
         console.error("ERROR RESTORING AUTHENTICATION :", error);
@@ -105,6 +142,9 @@ export const AuthProvider = ({ children }) => {
         JSON.stringify(authenticatedUser)
       );
 
+      // Sync custom profile name/photo from profile-service (Port 8088)
+      syncWithProfileService(authenticatedUser.id, authenticatedUser);
+
       console.log("GOOGLE LOGIN SUCCESS :", authenticatedUser);
 
       return {
@@ -130,13 +170,13 @@ export const AuthProvider = ({ children }) => {
   // GOOGLE OAUTH2
   // =========================================================
 
-const loginWithGoogle = (mode = "login") => {
-  console.log("REDIRECTING TO GOOGLE LOGIN");
+  const loginWithGoogle = (mode = "login") => {
+    console.log("REDIRECTING TO GOOGLE LOGIN");
 
-  window.location.assign(
-    `${BACKEND_BASE_URL}/api/oauth2/${mode}/google`
-  );
-};
+    window.location.assign(
+      `${BACKEND_BASE_URL}/api/oauth2/${mode}/google`
+    );
+  };
 
   // =========================================================
   // LOGOUT
@@ -151,44 +191,25 @@ const loginWithGoogle = (mode = "login") => {
   };
 
   // =========================================================
-  // UPDATE PROFILE
+  // UPDATE PROFILE (Sync state & localStorage instantly)
   // =========================================================
 
-  const updateProfile = async (updatedFields) => {
-    if (!user || !token) return;
+  const updateProfile = (updatedFields) => {
+    setUser((prevUser) => {
+      if (!prevUser) return prevUser;
 
-    const updatedUser = {
-      ...user,
-      ...updatedFields,
-    };
-
-    try {
-      const response = await fetch(
-        `${BACKEND_BASE_URL}/api/users/profile`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(updatedUser),
-          mode: "cors",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Profile update failed");
-      }
-
-      setUser(updatedUser);
+      const updatedUser = {
+        ...prevUser,
+        ...updatedFields,
+      };
 
       localStorage.setItem(
         STORAGE_KEY_USER,
         JSON.stringify(updatedUser)
       );
-    } catch (error) {
-      console.error("PROFILE UPDATE ERROR :", error);
-    }
+
+      return updatedUser;
+    });
   };
 
   // =========================================================
