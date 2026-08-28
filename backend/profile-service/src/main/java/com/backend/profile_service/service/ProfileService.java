@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.backend.profile_service.exception.ProfileNotFoundException;
 import java.util.List;
+import java.util.Optional;
+
 import com.backend.profile_service.dto.ProfileResponse;
 import com.backend.profile_service.dto.CreateProfileRequest;
 import com.backend.profile_service.dto.UpdateProfileRequest;
@@ -18,12 +20,10 @@ import java.io.IOException;
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
-
     private final ProfilePhotoService profilePhotoService;
 
-    //Search Profile by id
+    // Search Profile by id
     public ProfileResponse getProfileById(Long id) {
-
         Profile profile = profileRepository.findById(id)
                 .orElseThrow(() ->
                         new ProfileNotFoundException(
@@ -32,7 +32,17 @@ public class ProfileService {
         return mapToResponse(profile);
     }
 
-    //Get All Profile
+    // Search Profile by userId
+    public ProfileResponse getProfileByUserId(Long userId) {
+        Profile profile = profileRepository.findByUserId(userId)
+                .orElseThrow(() ->
+                        new ProfileNotFoundException(
+                                "Profile not found with userId: " + userId));
+
+        return mapToResponse(profile);
+    }
+
+    // Get All Profiles
     public List<ProfileResponse> getAllProfile() {
         return profileRepository.findAll()
                 .stream()
@@ -40,30 +50,33 @@ public class ProfileService {
                 .toList();
     }
 
-    //Create Profile
+    // Create Profile (safely returns existing profile if userId already exists)
     public ProfileResponse createProfile(CreateProfileRequest request){
+        Optional<Profile> existing = profileRepository.findByUserId(request.getUserId());
+        if (existing.isPresent()) {
+            return mapToResponse(existing.get());
+        }
 
         Profile profile = new Profile();
-
         profile.setUserId(request.getUserId());
         profile.setName(request.getName());
         profile.setProfilePhoto(request.getProfilePhoto());
 
         Profile savedProfile = profileRepository.save(profile);
-
         return mapToResponse(savedProfile);
     }
 
-    //Update Profile
+    // Update Profile
     public ProfileResponse updateProfile(Long id, UpdateProfileRequest request){
         Profile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new ProfileNotFoundException("Profile not found with id: " + id));
 
         profile.setName(request.getName());
-        profile.setProfilePhoto(request.getProfilePhoto());
+        if (request.getProfilePhoto() != null) {
+            profile.setProfilePhoto(request.getProfilePhoto());
+        }
 
         Profile savedProfile = profileRepository.save(profile);
-
         return mapToResponse(savedProfile);
     }
 
@@ -97,11 +110,9 @@ public class ProfileService {
                                 "Profile not found with id: " + id));
 
         String oldPhoto = profile.getProfilePhoto();
-
         String newPhoto = profilePhotoService.savePhoto(photo);
 
         profile.setProfilePhoto(newPhoto);
-
         Profile savedProfile = profileRepository.save(profile);
 
         if (oldPhoto != null && !oldPhoto.isBlank()
