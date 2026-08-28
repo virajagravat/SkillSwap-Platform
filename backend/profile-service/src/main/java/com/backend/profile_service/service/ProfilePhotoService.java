@@ -25,7 +25,7 @@ public class ProfilePhotoService {
                 .normalize();
     }
 
-    public String savePhoto(MultipartFile file) {
+    public String savePhoto(MultipartFile file) throws IOException {
 
         Files.createDirectories(uploadPath);
 
