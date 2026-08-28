@@ -9,12 +9,17 @@ import java.util.List;
 import com.backend.profile_service.dto.ProfileResponse;
 import com.backend.profile_service.dto.CreateProfileRequest;
 import com.backend.profile_service.dto.UpdateProfileRequest;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
+
+    private final ProfilePhotoService profilePhotoService;
 
     //Search Profile by id
     public ProfileResponse getProfileById(Long id) {
@@ -82,5 +87,28 @@ public class ProfileService {
         return response;
     }
 
+    public ProfileResponse uploadProfilePhoto(
+            Long id,
+            MultipartFile photo) throws IOException {
 
+        Profile profile = profileRepository.findById(id)
+                .orElseThrow(() ->
+                        new ProfileNotFoundException(
+                                "Profile not found with id: " + id));
+
+        String oldPhoto = profile.getProfilePhoto();
+
+        String newPhoto = profilePhotoService.savePhoto(photo);
+
+        profile.setProfilePhoto(newPhoto);
+
+        Profile savedProfile = profileRepository.save(profile);
+
+        if (oldPhoto != null && !oldPhoto.isBlank()
+                && !oldPhoto.startsWith("http")) {
+            profilePhotoService.deletePhoto(oldPhoto);
+        }
+
+        return mapToResponse(savedProfile);
+    }
 }

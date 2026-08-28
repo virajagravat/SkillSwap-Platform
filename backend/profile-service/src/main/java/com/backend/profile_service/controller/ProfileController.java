@@ -8,8 +8,11 @@ import com.backend.profile_service.service.ProfileService;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 import java.util.List;
 
@@ -57,7 +60,16 @@ public class ProfileController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping(
+            value = "/{id}/photo",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ProfileResponse uploadProfilePhoto(
+            @PathVariable Long id,
+            @RequestPart("photo") MultipartFile photo) throws IOException {
 
+        return profileService.uploadProfilePhoto(id, photo);
+    }
 
 
 }
