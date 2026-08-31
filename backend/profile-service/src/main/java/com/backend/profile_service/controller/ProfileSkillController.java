@@ -2,6 +2,7 @@ package com.backend.profile_service.controller;
 
 import com.backend.profile_service.dto.AddSkillRequest;
 import com.backend.profile_service.entity.ProfileSkill;
+import com.backend.profile_service.entity.SkillType;
 import com.backend.profile_service.service.ProfileSkillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +37,10 @@ public class ProfileSkillController {
     @DeleteMapping("/{profileId}/skills/{skillId}")
     public void removeSkillFromProfile(
             @PathVariable Long profileId,
-            @PathVariable Long skillId) {
+            @PathVariable Long skillId,
+            @RequestParam(required = false) SkillType skillType) {
 
-        profileSkillService.removeSkillFromProfile(profileId, skillId);
+        profileSkillService.removeSkillFromProfile(profileId, skillId, skillType);
     }
 
 }

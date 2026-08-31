@@ -20,5 +20,6 @@ public interface ProfileSkillRepository extends JpaRepository<ProfileSkill,Long>
 
     void deleteByProfileIdAndSkillId(Long profileId, Long skillId);
 
+    void deleteByProfileIdAndSkillIdAndSkillType(Long profileId, Long skillId, SkillType skillType);
 
 }

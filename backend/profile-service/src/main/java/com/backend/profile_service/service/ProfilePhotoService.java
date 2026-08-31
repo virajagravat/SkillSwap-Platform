@@ -27,9 +27,40 @@ public class ProfilePhotoService {
 
     public String savePhoto(MultipartFile file) throws IOException {
 
-        Files.createDirectories(uploadPath);
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Profile photo cannot be empty");
+        }
 
         String originalFileName = file.getOriginalFilename();
+
+        String contentType = file.getContentType();
+
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException(
+                    "Only image files are allowed"
+            );
+        }
+
+        long maxFileSize = 5 * 1024 * 1024;
+
+        if (file.getSize() > maxFileSize) {
+            throw new IllegalArgumentException(
+                    "Profile photo size must not exceed 5 MB"
+            );
+        }
+
+        if (originalFileName == null ||
+                !(originalFileName.toLowerCase().endsWith(".jpg")
+                        || originalFileName.toLowerCase().endsWith(".jpeg")
+                        || originalFileName.toLowerCase().endsWith(".png")
+                        || originalFileName.toLowerCase().endsWith(".webp"))) {
+
+            throw new IllegalArgumentException(
+                    "Only JPG, JPEG, PNG and WEBP images are allowed"
+            );
+        }
+
+        Files.createDirectories(uploadPath);
 
         String extension = "";
 
@@ -49,41 +80,7 @@ public class ProfilePhotoService {
                 StandardCopyOption.REPLACE_EXISTING
         );
 
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("Profile photo cannot be empty");
-        }
-
-        String contentType = file.getContentType();
-
-        if (contentType == null || !contentType.startsWith("image/")) {
-            throw new IllegalArgumentException(
-                    "Only image files are allowed"
-            );
-        }
-
-        long maxFileSize = 5 * 1024 * 1024;
-
-        if (file.getSize() > maxFileSize) {
-            throw new IllegalArgumentException(
-                    "Profile photo size must not exceed 5 MB"
-            );
-        }
-
-
-        if (originalFileName == null ||
-                !(originalFileName.toLowerCase().endsWith(".jpg")
-                        || originalFileName.toLowerCase().endsWith(".jpeg")
-                        || originalFileName.toLowerCase().endsWith(".png")
-                        || originalFileName.toLowerCase().endsWith(".webp"))) {
-
-            throw new IllegalArgumentException(
-                    "Only JPG, JPEG, PNG and WEBP images are allowed"
-            );
-        }
-
         return fileName;
-
-
     }
 
     public void deletePhoto(String fileName) throws IOException {

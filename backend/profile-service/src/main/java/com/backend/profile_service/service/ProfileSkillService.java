@@ -70,36 +70,37 @@ public class ProfileSkillService {
     }
 
     @Transactional
-    public void removeSkillFromProfile(Long profileId, Long skillId) {
+    public void removeSkillFromProfile(Long profileId, Long skillId, SkillType skillType) {
 
         profileRepository.findById(profileId)
                 .orElseThrow(() ->
-                        new RuntimeException("Profile not found with id: " + profileId));
+                        new ProfileNotFoundException("Profile not found with id: " + profileId));
 
         skillRepository.findById(skillId)
                 .orElseThrow(() ->
-                        new RuntimeException("Skill not found with id: " + skillId));
+                        new SkillNotFoundException("Skill not found with id: " + skillId));
 
-        boolean exists = profileSkillRepository
-                .existsByProfileIdAndSkillIdAndSkillType(
-                        profileId,
-                        skillId,
-                        SkillType.TEACH
-                );
-
-        if (!exists) {
-            exists = profileSkillRepository
+        if (skillType != null) {
+            boolean exists = profileSkillRepository
                     .existsByProfileIdAndSkillIdAndSkillType(
                             profileId,
                             skillId,
-                            SkillType.LEARN
+                            skillType
                     );
-        }
 
-        if (!exists) {
-            throw new SkillNotAssociatedException(
-                    "Skill is not associated with this profile"
+            if (!exists) {
+                throw new SkillNotAssociatedException(
+                        "Skill is not associated with this profile"
+                );
+            }
+
+            profileSkillRepository.deleteByProfileIdAndSkillIdAndSkillType(
+                    profileId,
+                    skillId,
+                    skillType
             );
+
+            return;
         }
 
         profileSkillRepository.deleteByProfileIdAndSkillId(
