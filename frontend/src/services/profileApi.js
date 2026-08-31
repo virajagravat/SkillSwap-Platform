@@ -15,10 +15,12 @@ const handleResponse = async (response) => {
     }
     throw new Error(errorMessage);
   }
-  if (response.status === 24 || response.status === 204) {
+
+  const text = await response.text();
+  if (!text || !text.trim()) {
     return null;
   }
-  return response.json();
+  return JSON.parse(text);
 };
 
 /**
@@ -41,6 +43,14 @@ export const getProfileById = async (id) => {
  * Find profile by userId
  */
 export const getProfileByUserId = async (userId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/profiles/user/${userId}`);
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (err) {
+    console.warn('Direct user profile fetch fallback:', err);
+  }
   const profiles = await getAllProfiles();
   return profiles.find((p) => String(p.userId) === String(userId)) || null;
 };

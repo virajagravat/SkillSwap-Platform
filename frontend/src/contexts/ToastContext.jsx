@@ -11,7 +11,19 @@ export const ToastProvider = ({ children }) => {
     setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
   }, []);
 
-  const showToast = useCallback(({ message, type = 'info', duration = 4000 }) => {
+  const showToast = useCallback((msgOrObj, typeParam = 'info', durationParam = 4000) => {
+    let message = '';
+    let type = typeParam;
+    let duration = durationParam;
+
+    if (typeof msgOrObj === 'string') {
+      message = msgOrObj;
+    } else if (msgOrObj && typeof msgOrObj === 'object') {
+      message = msgOrObj.message || '';
+      type = msgOrObj.type || 'info';
+      duration = msgOrObj.duration || 4000;
+    }
+
     const id = Date.now() + Math.random().toString();
     setToasts((prev) => [...prev, { id, message, type }]);
 

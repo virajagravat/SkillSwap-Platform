@@ -37,7 +37,7 @@ import {
 } from '../services/profileApi';
 
 const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, updateProfile: updateAuthUser } = useAuth();
   const { showToast } = useToast();
 
   const [profile, setProfile] = useState(null);
@@ -89,13 +89,22 @@ const ProfilePage = () => {
         }
       }
 
-      setProfile(userProfile || defaultProfile);
-      setEditName((userProfile || defaultProfile).name || '');
+      const activeProfile = userProfile || defaultProfile;
+      setProfile(activeProfile);
+      setEditName(activeProfile.name || '');
+
+      // Sync name & photo with AuthContext so Navbar updates
+      if (updateAuthUser && activeProfile?.name) {
+        updateAuthUser({
+          fullName: activeProfile.name,
+          avatarUrl: getFullPhotoUrl(activeProfile.profilePhoto) || user?.avatarUrl
+        });
+      }
 
       // Load Profile Skills
-      if (userProfile?.id) {
+      if (activeProfile?.id) {
         try {
-          const profileSkills = await getProfileSkills(userProfile.id);
+          const profileSkills = await getProfileSkills(activeProfile.id);
           setSkills(profileSkills || []);
         } catch (skillErr) {
           console.warn('Skills load error:', skillErr);
@@ -113,7 +122,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     loadProfileData();
-  }, [user]);
+  }, [user?.id]);
 
   // Ensure active profile ID exists or create it
   const ensureProfileId = async () => {
@@ -148,6 +157,15 @@ const ProfilePage = () => {
       const profileId = await ensureProfileId();
       const updatedProfile = await uploadProfilePhoto(profileId, file);
       setProfile(updatedProfile);
+
+      // Sync with top Navbar in real-time
+      if (updateAuthUser) {
+        updateAuthUser({
+          fullName: updatedProfile.name,
+          avatarUrl: getFullPhotoUrl(updatedProfile.profilePhoto)
+        });
+      }
+
       showToast('Profile photo updated successfully!', 'success');
     } catch (error) {
       console.error('Photo upload failed:', error);
@@ -175,6 +193,15 @@ const ProfilePage = () => {
       });
       setProfile(updated);
       setIsEditModalOpen(false);
+
+      // Sync with top Navbar in real-time
+      if (updateAuthUser) {
+        updateAuthUser({
+          fullName: updated.name,
+          avatarUrl: getFullPhotoUrl(updated.profilePhoto) || user?.avatarUrl
+        });
+      }
+
       showToast('Profile updated successfully!', 'success');
     } catch (error) {
       console.error('Update profile error:', error);
