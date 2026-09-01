@@ -169,7 +169,7 @@ const ProfilePage = () => {
       showToast('Profile photo updated successfully!', 'success');
     } catch (error) {
       console.error('Photo upload failed:', error);
-      showToast(error.message || 'Failed to upload photo (Make sure profile-service on 8088 is running)', 'error');
+      showToast(error.message || 'Failed to upload photo (Make sure profile-service on 8087 is running)', 'error');
     } finally {
       setUploadingPhoto(false);
     }
