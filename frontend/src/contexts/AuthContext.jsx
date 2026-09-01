@@ -6,7 +6,7 @@ const STORAGE_KEY_USER = "skillswap_user";
 const STORAGE_KEY_TOKEN = "skillswap_token";
 
 const BACKEND_BASE_URL = "http://localhost:8085";
-const PROFILE_SERVICE_BASE_URL = "http://localhost:8088";
+const PROFILE_SERVICE_BASE_URL = "http://localhost:8087";
 
 const getFullPhotoUrl = (photoPath) => {
   if (!photoPath) return null;

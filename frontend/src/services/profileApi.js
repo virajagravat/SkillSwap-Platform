@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8088';
+const BASE_URL = 'http://localhost:8087';
 
 /**
  * Helper to handle HTTP errors
