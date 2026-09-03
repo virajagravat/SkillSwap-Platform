@@ -5,14 +5,11 @@ import com.backend.profile_service.entity.Skill;
 import com.backend.profile_service.service.SkillService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.backend.profile_service.dto.CreateSkillRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
+import com.backend.profile_service.entity.ProfileSkill;
+import com.backend.profile_service.entity.SkillType;
 
 
 import java.util.List;
@@ -32,5 +29,13 @@ public class SkillController {
     @PostMapping
     public Skill createSkill(@Valid @RequestBody CreateSkillRequest request){
         return skillService.createSkill(request);
+    }
+
+    @GetMapping("/{skillId}/profiles")
+    public List<ProfileSkill> getProfilesBySkill(
+            @PathVariable Long skillId,
+            @RequestParam(defaultValue = "TEACH") SkillType skillType) {
+
+        return skillService.getProfilesBySkill(skillId, skillType);
     }
 }

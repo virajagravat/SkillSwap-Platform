@@ -69,6 +69,22 @@ public class ProfileSkillService {
         return profileSkillRepository.findByProfileId(profileId);
     }
 
+    public List<ProfileSkill> getProfilesBySkill(
+            Long skillId,
+            SkillType skillType) {
+
+        skillRepository.findById(skillId)
+                .orElseThrow(() ->
+                        new SkillNotFoundException(
+                                "Skill not found with id: " + skillId
+                        ));
+
+        return profileSkillRepository.findBySkillIdAndSkillType(
+                skillId,
+                skillType
+        );
+    }
+
     @Transactional
     public void removeSkillFromProfile(Long profileId, Long skillId) {
 
