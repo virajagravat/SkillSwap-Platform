@@ -1,9 +1,14 @@
 package com.backend.browse_skill_service.client;
 
 
+import com.backend.browse_skill_service.dto.ProfileSkillResponse;
+import com.backend.browse_skill_service.dto.SkillResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -13,7 +18,7 @@ public class ProfileServiceClient {
     private static final String PROFILE_SERVICE_URL =
             "http://localhost:8087";
 
-    public String getProfilesBySkill(
+    public List<ProfileSkillResponse> getProfilesBySkill(
             Long skillId,
             String skillType) {
 
@@ -23,16 +28,16 @@ public class ProfileServiceClient {
                         skillId,
                         skillType)
                 .retrieve()
-                .body(String.class);
+                .body(new ParameterizedTypeReference<>() {});
     }
 
-    public String searchSkills(String name) {
+    public List<SkillResponse> searchSkills(String name) {
 
         return restClient.get()
                 .uri(PROFILE_SERVICE_URL
                                 + "/api/skills/search?name={name}",
                         name)
                 .retrieve()
-                .body(String.class);
+                .body(new ParameterizedTypeReference<>() {});
     }
 }
