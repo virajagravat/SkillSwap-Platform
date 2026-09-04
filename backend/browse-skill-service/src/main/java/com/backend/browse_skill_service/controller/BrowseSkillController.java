@@ -12,7 +12,7 @@ import com.backend.browse_skill_service.dto.PagedBrowseSkillResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
-import java.util.List;
+
 
 import jakarta.validation.constraints.NotBlank;
 
