@@ -29,6 +29,7 @@ public class SecurityConfig {
                                 "/api/oauth2/**",
                                 "/api/profiles/**",
                                 "/api/skills/**",
+                                "/api/browse/**",
                                 "/uploads/**"
                         ).permitAll()
                         .anyExchange().authenticated()
