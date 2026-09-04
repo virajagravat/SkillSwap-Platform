@@ -3,6 +3,7 @@ package com.backend.browse_skill_service.service;
 
 import com.backend.browse_skill_service.client.ProfileServiceClient;
 import com.backend.browse_skill_service.dto.BrowseSkillSearchResponse;
+import com.backend.browse_skill_service.dto.PagedBrowseSkillResponse;
 import com.backend.browse_skill_service.dto.ProfileSkillResponse;
 import com.backend.browse_skill_service.dto.SkillResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.List;
 public class BrowseSkillService {
     private final ProfileServiceClient profileServiceClient;
 
-    public List<BrowseSkillSearchResponse> searchSkills(String name) {
+    public PagedBrowseSkillResponse searchSkills(String name,int page, int size) {
 
         List<SkillResponse> skills =
                 profileServiceClient.searchSkills(name);
@@ -65,6 +66,29 @@ public class BrowseSkillService {
             }
         }
 
-        return results;
+        int totalElements = results.size();
+
+        int start = page * size;
+        int end = Math.min(start + size, totalElements);
+
+        List<BrowseSkillSearchResponse> pagedResults;
+
+        if (start >= totalElements) {
+            pagedResults = List.of();
+        } else {
+            pagedResults = results.subList(start, end);
+        }
+
+        int totalPages =
+                (int) Math.ceil((double) totalElements / size);
+
+        return new PagedBrowseSkillResponse(
+                pagedResults,
+                page,
+                size,
+                totalElements,
+                totalPages
+        );
+
     }
 }

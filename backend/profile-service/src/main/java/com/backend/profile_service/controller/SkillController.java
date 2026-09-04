@@ -10,6 +10,7 @@ import com.backend.profile_service.dto.CreateSkillRequest;
 import jakarta.validation.Valid;
 import com.backend.profile_service.entity.ProfileSkill;
 import com.backend.profile_service.entity.SkillType;
+import com.backend.profile_service.dto.AddSkillRequest;
 
 
 import java.util.List;
@@ -37,5 +38,16 @@ public class SkillController {
             @RequestParam(defaultValue = "TEACH") SkillType skillType) {
 
         return skillService.getProfilesBySkill(skillId, skillType);
+    }
+
+    @PostMapping("/profiles/{profileId}")
+    public ProfileSkill addSkillToProfile(
+            @PathVariable Long profileId,
+            @Valid @RequestBody AddSkillRequest request) {
+
+        return skillService.addSkillToProfile(
+                profileId,
+                request
+        );
     }
 }

@@ -9,6 +9,10 @@ import com.backend.profile_service.exception.SkillAlreadyExistsException;
 import com.backend.profile_service.entity.ProfileSkill;
 import com.backend.profile_service.entity.SkillType;
 import com.backend.profile_service.repository.ProfileSkillRepository;
+import com.backend.profile_service.dto.AddSkillRequest;
+import com.backend.profile_service.entity.Profile;
+import com.backend.profile_service.repository.ProfileRepository;
+import com.backend.profile_service.exception.ProfileNotFoundException;
 
 
 
@@ -18,10 +22,13 @@ import java.util.List;
 public class SkillService {
     private final SkillRepository skillRepository;
     private final ProfileSkillRepository profileSkillRepository;
+    private final ProfileRepository profileRepository;
 
-    public SkillService(SkillRepository skillRepository,ProfileSkillRepository profileSkillRepository) {
+    public SkillService(SkillRepository skillRepository,ProfileSkillRepository profileSkillRepository,
+                        ProfileRepository profileRepository) {
         this.skillRepository = skillRepository;
         this.profileSkillRepository = profileSkillRepository;
+        this.profileRepository = profileRepository;
     }
 
     public  List<Skill> searchSkills(String query) {
@@ -58,6 +65,46 @@ public class SkillService {
                 skillId,
                 skillType
         );
+    }
+
+    public ProfileSkill addSkillToProfile(
+            Long profileId,
+            AddSkillRequest request) {
+
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() ->
+                        new ProfileNotFoundException(
+                                "Profile not found with id: " + profileId
+                        ));
+
+        Skill skill = skillRepository.findById(request.getSkillId())
+                .orElseThrow(() ->
+                        new SkillNotFoundException(
+                                "Skill not found with id: "
+                                        + request.getSkillId()
+                        ));
+
+        boolean alreadyExists =
+                profileSkillRepository
+                        .existsByProfileIdAndSkillIdAndSkillType(
+                                profileId,
+                                request.getSkillId(),
+                                request.getSkillType()
+                        );
+
+        if (alreadyExists) {
+            throw new IllegalArgumentException(
+                    "Skill already added to profile"
+            );
+        }
+
+        ProfileSkill profileSkill = new ProfileSkill();
+
+        profileSkill.setProfile(profile);
+        profileSkill.setSkill(skill);
+        profileSkill.setSkillType(request.getSkillType());
+
+        return profileSkillRepository.save(profileSkill);
     }
 }
 
