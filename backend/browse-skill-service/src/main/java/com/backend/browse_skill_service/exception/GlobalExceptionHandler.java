@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,5 +22,12 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getDefaultMessage())
                 .findFirst()
                 .orElse("Validation failed");
+    }
+    @ExceptionHandler(ProfileServiceException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public String handleProfileServiceException(
+            ProfileServiceException exception) {
+
+        return exception.getMessage();
     }
 }
