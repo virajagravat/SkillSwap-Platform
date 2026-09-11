@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -39,24 +40,27 @@ public class ProfileController {
     }
 
     // Create profile
-    @PostMapping
-    public ProfileResponse createProfile(
-            @Valid @RequestBody CreateProfileRequest request) {
+    
+@PostMapping
+public ProfileResponse createProfile(
+        @Valid @RequestBody CreateProfileRequest request) {
 
         return profileService.createProfile(request);
     }
 
     // Update profile
-    @PutMapping("/{id}")
-    public ProfileResponse updateProfile(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateProfileRequest request) {
+    
+@PutMapping("/{id}")
+public ProfileResponse updateProfile(
+        @PathVariable Long id,
+        @Valid @RequestBody UpdateProfileRequest request) {
 
         return profileService.updateProfile(id, request);
     }
 
     // Delete profile
-    @DeleteMapping("/{id}")
+    
+@DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
         profileService.deleteProfile(id);
         return ResponseEntity.noContent().build();
