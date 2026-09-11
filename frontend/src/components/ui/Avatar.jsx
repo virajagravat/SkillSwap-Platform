@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { cn } from '../../utils/cn';
 
 const sizes = {
@@ -32,14 +32,27 @@ const getInitials = (name) => {
 
 const Avatar = ({
   src,
+  fallbackSrc,
   name,
   size = 'md',
   status,
   className,
   ...props
 }) => {
-  const [imageError, setImageError] = useState(false);
+  const [activeSrc, setActiveSrc] = useState(src);
   const initials = getInitials(name);
+
+  useEffect(() => {
+    setActiveSrc(src);
+  }, [src]);
+
+  const handleImageError = () => {
+    if (fallbackSrc && activeSrc !== fallbackSrc) {
+      setActiveSrc(fallbackSrc);
+      return;
+    }
+    setActiveSrc(null);
+  };
 
   return (
     <div className="relative inline-block shrink-0">
@@ -52,11 +65,11 @@ const Avatar = ({
         )}
         {...props}
       >
-        {src && !imageError ? (
+        {activeSrc ? (
           <img
-            src={src}
+            src={activeSrc}
             alt={name || 'Avatar'}
-            onError={() => setImageError(true)}
+            onError={handleImageError}
             className="w-full h-full object-cover"
           />
         ) : (

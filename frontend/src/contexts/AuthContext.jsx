@@ -8,12 +8,20 @@ const STORAGE_KEY_TOKEN = "skillswap_token";
 const BACKEND_BASE_URL = "http://localhost:8085";
 const PROFILE_SERVICE_BASE_URL = "http://localhost:8087";
 
+const getAuthHeaders = (jwtToken) => {
+  const token = jwtToken || localStorage.getItem(STORAGE_KEY_TOKEN);
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 const getFullPhotoUrl = (photoPath) => {
   if (!photoPath) return null;
   if (photoPath.startsWith("http://") || photoPath.startsWith("https://")) {
     return photoPath;
   }
-  return `${PROFILE_SERVICE_BASE_URL}/uploads/profiles/${photoPath}`;
+  if (photoPath.startsWith("/uploads/")) {
+    return `${PROFILE_SERVICE_BASE_URL}${photoPath}`;
+  }
+  return `${PROFILE_SERVICE_BASE_URL}/uploads/profiles/${photoPath.replace(/^\/+/, "")}`;
 };
 
 const normalizeUser = (backendUser = {}) => ({
@@ -31,11 +39,13 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Helper to fetch latest custom profile from profile-service (Port 8088)
-  const syncWithProfileService = async (userId, initialUser) => {
+  // Helper to fetch latest custom profile from profile-service
+  const syncWithProfileService = async (userId, initialUser, jwtToken) => {
     if (!userId) return;
     try {
-      const res = await fetch(`${PROFILE_SERVICE_BASE_URL}/api/profiles/user/${userId}`);
+      const res = await fetch(`${PROFILE_SERVICE_BASE_URL}/api/profiles/user/${userId}`, {
+        headers: getAuthHeaders(jwtToken),
+      });
       if (res.ok) {
         const pData = await res.json();
         if (pData && pData.name) {
@@ -142,8 +152,8 @@ export const AuthProvider = ({ children }) => {
         JSON.stringify(authenticatedUser)
       );
 
-      // Sync custom profile name/photo from profile-service (Port 8088)
-      syncWithProfileService(authenticatedUser.id, authenticatedUser);
+      // Sync custom profile name/photo from profile-service
+      syncWithProfileService(authenticatedUser.id, authenticatedUser, jwtToken);
 
       console.log("GOOGLE LOGIN SUCCESS :", authenticatedUser);
 

@@ -67,5 +67,8 @@ export const getFullPhotoUrl = (photoPath) => {
   if (photoPath.startsWith('http://') || photoPath.startsWith('https://')) {
     return photoPath;
   }
-  return `${PROFILE_URL}/uploads/profiles/${photoPath}`;
+  if (photoPath.startsWith('/uploads/')) {
+    return `${PROFILE_URL}${photoPath}`;
+  }
+  return `${PROFILE_URL}/uploads/profiles/${photoPath.replace(/^\/+/, '')}`;
 };
