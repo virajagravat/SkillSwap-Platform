@@ -1,4 +1,6 @@
-const BASE_URL = 'http://localhost:8087';
+const GATEWAY_URL = 'http://localhost:8086';
+const DIRECT_URL = 'http://localhost:8087';
+const PHOTO_BASE_URL = DIRECT_URL;
 const STORAGE_KEY_TOKEN = 'skillswap_token';
 
 const getAuthHeaders = () => {
@@ -34,24 +36,52 @@ const handleResponse = async (response) => {
   return JSON.parse(text);
 };
 
+const requestProfileService = async (path, options = {}) => {
+  let gatewayResponse;
+  try {
+    gatewayResponse = await fetch(`${GATEWAY_URL}${path}`, options);
+  } catch (gatewayErr) {
+    console.warn('API Gateway unreachable for Profile Service, trying direct port:', gatewayErr.message);
+    return requestDirectProfileService(path, options);
+  }
+
+  if (gatewayResponse.status === 502 || gatewayResponse.status === 503 || gatewayResponse.status === 504) {
+    console.warn(`API Gateway returned ${gatewayResponse.status} for Profile Service, trying direct port`);
+    return requestDirectProfileService(path, options);
+  }
+
+  return handleResponse(gatewayResponse);
+};
+
+const requestDirectProfileService = async (path, options = {}) => {
+  let response;
+  try {
+    response = await fetch(`${DIRECT_URL}${path}`, options);
+  } catch (directErr) {
+    throw new Error(
+      `Failed to reach Profile Service. Start API Gateway on 8086 or profile-service on 8087. ${directErr.message}`
+    );
+  }
+
+  return handleResponse(response);
+};
+
 /**
  * Fetch all profiles
  */
 export const getAllProfiles = async () => {
-  const response = await fetch(`${BASE_URL}/api/profiles`, {
+  return requestProfileService('/api/profiles', {
     headers: getAuthHeaders(),
   });
-  return handleResponse(response);
 };
 
 /**
  * Get profile by profile ID
  */
 export const getProfileById = async (id) => {
-  const response = await fetch(`${BASE_URL}/api/profiles/${id}`, {
+  return requestProfileService(`/api/profiles/${id}`, {
     headers: getAuthHeaders(),
   });
-  return handleResponse(response);
 };
 
 /**
@@ -59,14 +89,11 @@ export const getProfileById = async (id) => {
  */
 export const getProfileByUserId = async (userId) => {
   try {
-    const response = await fetch(`${BASE_URL}/api/profiles/user/${userId}`, {
+    return await requestProfileService(`/api/profiles/user/${userId}`, {
       headers: getAuthHeaders(),
     });
-    if (response.ok) {
-      return await response.json();
-    }
   } catch (err) {
-    console.warn('Direct user profile fetch fallback:', err);
+    console.warn('User profile lookup fallback:', err);
   }
   const profiles = await getAllProfiles();
   return profiles.find((p) => String(p.userId) === String(userId)) || null;
@@ -76,24 +103,22 @@ export const getProfileByUserId = async (userId) => {
  * Create a new profile
  */
 export const createProfile = async (profileData) => {
-  const response = await fetch(`${BASE_URL}/api/profiles`, {
+  return requestProfileService('/api/profiles', {
     method: 'POST',
     headers: getJsonHeaders(),
     body: JSON.stringify(profileData),
   });
-  return handleResponse(response);
 };
 
 /**
  * Update profile details (Name / photo URL)
  */
 export const updateProfile = async (id, profileData) => {
-  const response = await fetch(`${BASE_URL}/api/profiles/${id}`, {
+  return requestProfileService(`/api/profiles/${id}`, {
     method: 'PUT',
     headers: getJsonHeaders(),
     body: JSON.stringify(profileData),
   });
-  return handleResponse(response);
 };
 
 /**
@@ -103,67 +128,64 @@ export const uploadProfilePhoto = async (id, file) => {
   const formData = new FormData();
   formData.append('photo', file);
 
-  const response = await fetch(`${BASE_URL}/api/profiles/${id}/photo`, {
+  return requestProfileService(`/api/profiles/${id}/photo`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: formData,
   });
-  return handleResponse(response);
 };
 
 /**
  * Get skills associated with profile
  */
 export const getProfileSkills = async (profileId) => {
-  const response = await fetch(`${BASE_URL}/api/profiles/${profileId}/skills`, {
+  return requestProfileService(`/api/profiles/${profileId}/skills`, {
     headers: getAuthHeaders(),
   });
-  return handleResponse(response);
 };
 
 /**
  * Add skill to profile (TEACH or LEARN)
  */
 export const addSkillToProfile = async (profileId, skillId, skillType) => {
-  const response = await fetch(`${BASE_URL}/api/profiles/${profileId}/skills`, {
+  return requestProfileService(`/api/profiles/${profileId}/skills`, {
     method: 'POST',
     headers: getJsonHeaders(),
     body: JSON.stringify({ skillId, skillType }),
   });
-  return handleResponse(response);
 };
 
 /**
  * Remove skill from profile
  */
-export const removeSkillFromProfile = async (profileId, skillId) => {
-  const response = await fetch(`${BASE_URL}/api/profiles/${profileId}/skills/${skillId}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  return handleResponse(response);
+export const removeSkillFromProfile = async (profileId, skillId, skillType = 'TEACH') => {
+  return requestProfileService(
+    `/api/profiles/${profileId}/skills/${skillId}?skillType=${encodeURIComponent(skillType)}`,
+    {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    }
+  );
 };
 
 /**
  * Search global skills
  */
 export const searchSkills = async (query) => {
-  const response = await fetch(`${BASE_URL}/api/skills/search?name=${encodeURIComponent(query)}`, {
+  return requestProfileService(`/api/skills/search?name=${encodeURIComponent(query)}`, {
     headers: getAuthHeaders(),
   });
-  return handleResponse(response);
 };
 
 /**
  * Create a new global skill
  */
 export const createSkill = async (name) => {
-  const response = await fetch(`${BASE_URL}/api/skills`, {
+  return requestProfileService('/api/skills', {
     method: 'POST',
     headers: getJsonHeaders(),
     body: JSON.stringify({ name }),
   });
-  return handleResponse(response);
 };
 
 /**
@@ -175,7 +197,7 @@ export const getFullPhotoUrl = (photoPath) => {
     return photoPath;
   }
   if (photoPath.startsWith('/uploads/')) {
-    return `${BASE_URL}${photoPath}`;
+    return `${PHOTO_BASE_URL}${photoPath}`;
   }
-  return `${BASE_URL}/uploads/profiles/${photoPath.replace(/^\/+/, '')}`;
+  return `${PHOTO_BASE_URL}/uploads/profiles/${photoPath.replace(/^\/+/, '')}`;
 };
