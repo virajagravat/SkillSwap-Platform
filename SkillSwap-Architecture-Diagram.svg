@@ -1,0 +1,224 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1400" viewBox="0 0 1900 1400">
+  <defs>
+    <style>
+      .page { fill: #ffffff; }
+      .title { font: 700 34px Arial, sans-serif; fill: #152033; }
+      .subtitle { font: 400 16px Arial, sans-serif; fill: #586579; }
+      .lane { fill: #f6f8fc; stroke: #d8dee9; stroke-width: 2; rx: 18; }
+      .laneTitle { font: 700 15px Arial, sans-serif; fill: #667284; letter-spacing: .4px; }
+      .box { fill: #ffffff; stroke: #2f5f98; stroke-width: 2.4; rx: 10; }
+      .api { fill: #f0f7ff; stroke: #2f5f98; stroke-width: 2.2; rx: 10; }
+      .service { fill: #ffffff; stroke: #255987; stroke-width: 2.6; rx: 10; }
+      .db { fill: #eef8ff; stroke: #255987; stroke-width: 2.4; }
+      .external { fill: #f8fbf6; stroke: #4f7d45; stroke-width: 2.4; rx: 10; }
+      .note { fill: #fffdf5; stroke: #d3b45f; stroke-width: 1.8; rx: 8; }
+      .label { font: 700 19px Arial, sans-serif; fill: #152033; }
+      .small { font: 400 14px Arial, sans-serif; fill: #526071; }
+      .tiny { font: 400 12px Arial, sans-serif; fill: #526071; }
+      .code { font: 600 12px Consolas, monospace; fill: #29384c; }
+      .arrow { stroke: #25364a; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .softArrow { stroke: #5a6c82; stroke-width: 1.9; fill: none; marker-end: url(#softArrow); }
+      .dbArrow { stroke: #255987; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#25364a"/>
+    </marker>
+    <marker id="softArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#5a6c82"/>
+    </marker>
+  </defs>
+
+  <rect class="page" width="1900" height="1400"/>
+
+  <text x="60" y="58" class="title">SkillSwap Platform - Deep API Flow Diagram</text>
+  <text x="60" y="86" class="subtitle">Frontend action -> API route -> service/controller function -> repository/database -> response</text>
+
+  <rect x="50" y="120" width="1800" height="250" class="lane"/>
+  <text x="72" y="150" class="laneTitle">MAIN SYSTEM FLOW</text>
+
+  <rect x="90" y="190" width="210" height="72" class="box"/>
+  <text x="195" y="218" text-anchor="middle" class="label">User</text>
+  <text x="195" y="240" text-anchor="middle" class="small">Browser</text>
+
+  <rect x="380" y="180" width="280" height="92" class="box"/>
+  <text x="520" y="209" text-anchor="middle" class="label">React Frontend</text>
+  <text x="520" y="231" text-anchor="middle" class="small">localhost:5173</text>
+  <text x="520" y="252" text-anchor="middle" class="tiny">AuthContext, profileApi, pages</text>
+
+  <rect x="740" y="180" width="285" height="92" class="service"/>
+  <text x="882" y="209" text-anchor="middle" class="label">API Gateway</text>
+  <text x="882" y="231" text-anchor="middle" class="small">localhost:8086</text>
+  <text x="882" y="252" text-anchor="middle" class="tiny">Routes APIs to services</text>
+
+  <rect x="1105" y="180" width="285" height="92" class="service"/>
+  <text x="1247" y="209" text-anchor="middle" class="label">Eureka Registry</text>
+  <text x="1247" y="231" text-anchor="middle" class="small">localhost:8761</text>
+  <text x="1247" y="252" text-anchor="middle" class="tiny">Service discovery</text>
+
+  <rect x="1470" y="170" width="300" height="112" class="note"/>
+  <text x="1620" y="198" text-anchor="middle" class="label">Backend Services</text>
+  <text x="1620" y="222" text-anchor="middle" class="small">Auth, Profile</text>
+  <text x="1620" y="243" text-anchor="middle" class="small">Browse Skill</text>
+  <text x="1620" y="264" text-anchor="middle" class="small">Skill Swap Request</text>
+
+  <path class="arrow" d="M300 226 L380 226"/>
+  <path class="arrow" d="M660 226 L740 226"/>
+  <path class="softArrow" d="M1025 226 L1105 226"/>
+  <path class="softArrow" d="M1390 226 L1470 226"/>
+  <text x="682" y="208" class="code">fetch()</text>
+  <text x="1040" y="208" class="code">Eureka lookup</text>
+
+  <rect x="50" y="410" width="1800" height="210" class="lane"/>
+  <text x="72" y="440" class="laneTitle">AUTHENTICATION FLOW - GOOGLE OAUTH2 + JWT</text>
+
+  <rect x="90" y="478" width="245" height="78" class="box"/>
+  <text x="212" y="506" text-anchor="middle" class="label">Login/Register Button</text>
+  <text x="212" y="528" text-anchor="middle" class="small">AuthContext.loginWithGoogle()</text>
+
+  <rect x="390" y="466" width="310" height="104" class="api"/>
+  <text x="545" y="494" text-anchor="middle" class="label">Auth API Route</text>
+  <text x="545" y="519" text-anchor="middle" class="code">GET /api/oauth2/login/google</text>
+  <text x="545" y="540" text-anchor="middle" class="code">GET /api/oauth2/register/google</text>
+
+  <rect x="755" y="466" width="300" height="104" class="service"/>
+  <text x="905" y="494" text-anchor="middle" class="label">OAuth2StartController</text>
+  <text x="905" y="519" text-anchor="middle" class="code">loginWithGoogle()</text>
+  <text x="905" y="540" text-anchor="middle" class="code">registerWithGoogle()</text>
+  <text x="905" y="561" text-anchor="middle" class="tiny">sets skillswap_auth_mode cookie</text>
+
+  <rect x="1110" y="478" width="230" height="78" class="external"/>
+  <text x="1225" y="508" text-anchor="middle" class="label">Google OAuth</text>
+  <text x="1225" y="531" text-anchor="middle" class="small">Consent + callback</text>
+
+  <rect x="1395" y="450" width="330" height="136" class="service"/>
+  <text x="1560" y="478" text-anchor="middle" class="label">OAuth2LoginSuccessHandler</text>
+  <text x="1560" y="503" text-anchor="middle" class="code">onAuthenticationSuccess()</text>
+  <text x="1560" y="524" text-anchor="middle" class="tiny">find/create user by email</text>
+  <text x="1560" y="545" text-anchor="middle" class="tiny">assign USER role + ACTIVE status</text>
+  <text x="1560" y="566" text-anchor="middle" class="tiny">JwtService.generateToken(email)</text>
+
+  <ellipse cx="1560" cy="650" rx="145" ry="42" class="db"/>
+  <text x="1560" y="643" text-anchor="middle" class="label">Auth DB</text>
+  <text x="1560" y="664" text-anchor="middle" class="tiny">users, roles, account_status</text>
+
+  <path class="arrow" d="M335 517 L390 517"/>
+  <path class="arrow" d="M700 517 L755 517"/>
+  <path class="arrow" d="M1055 517 L1110 517"/>
+  <path class="arrow" d="M1340 517 L1395 517"/>
+  <path class="dbArrow" d="M1560 586 L1560 608"/>
+  <path class="softArrow" d="M1395 586 C1190 628 850 628 620 575"/>
+  <text x="900" y="612" class="code">redirect /oauth-success?token=JWT</text>
+
+  <rect x="50" y="710" width="1800" height="250" class="lane"/>
+  <text x="72" y="740" class="laneTitle">PROFILE + SKILL MANAGEMENT FLOW</text>
+
+  <rect x="90" y="790" width="245" height="96" class="box"/>
+  <text x="212" y="818" text-anchor="middle" class="label">Profile Page</text>
+  <text x="212" y="842" text-anchor="middle" class="small">profileApi.js</text>
+  <text x="212" y="863" text-anchor="middle" class="tiny">create/update/photo/skills</text>
+
+  <rect x="390" y="750" width="315" height="176" class="api"/>
+  <text x="548" y="778" text-anchor="middle" class="label">Profile APIs</text>
+  <text x="548" y="803" text-anchor="middle" class="code">GET /api/profiles</text>
+  <text x="548" y="823" text-anchor="middle" class="code">GET /api/profiles/{id}</text>
+  <text x="548" y="843" text-anchor="middle" class="code">GET /api/profiles/user/{userId}</text>
+  <text x="548" y="863" text-anchor="middle" class="code">POST /api/profiles</text>
+  <text x="548" y="883" text-anchor="middle" class="code">PUT /api/profiles/{id}</text>
+  <text x="548" y="903" text-anchor="middle" class="code">POST /api/profiles/{id}/photo</text>
+
+  <rect x="760" y="750" width="315" height="176" class="api"/>
+  <text x="918" y="778" text-anchor="middle" class="label">Skill APIs</text>
+  <text x="918" y="803" text-anchor="middle" class="code">GET /api/skills/search?name=</text>
+  <text x="918" y="823" text-anchor="middle" class="code">POST /api/skills</text>
+  <text x="918" y="851" text-anchor="middle" class="code">GET /api/profiles/{profileId}/skills</text>
+  <text x="918" y="871" text-anchor="middle" class="code">POST /api/profiles/{profileId}/skills</text>
+  <text x="918" y="891" text-anchor="middle" class="code">DELETE /api/profiles/{profileId}/skills/{skillId}</text>
+  <text x="918" y="912" text-anchor="middle" class="tiny">skillType = TEACH or LEARN</text>
+
+  <rect x="1130" y="750" width="330" height="176" class="service"/>
+  <text x="1295" y="778" text-anchor="middle" class="label">Profile Service Controllers</text>
+  <text x="1295" y="804" text-anchor="middle" class="code">ProfileController</text>
+  <text x="1295" y="825" text-anchor="middle" class="tiny">getAllProfile(), getProfileById()</text>
+  <text x="1295" y="846" text-anchor="middle" class="tiny">createProfile(), updateProfile()</text>
+  <text x="1295" y="867" text-anchor="middle" class="code">SkillController</text>
+  <text x="1295" y="888" text-anchor="middle" class="tiny">searchSkills(), createSkill()</text>
+  <text x="1295" y="909" text-anchor="middle" class="code">ProfileSkillController</text>
+
+  <ellipse cx="1630" cy="838" rx="160" ry="52" class="db"/>
+  <text x="1630" y="826" text-anchor="middle" class="label">Profile DB</text>
+  <text x="1630" y="849" text-anchor="middle" class="tiny">profiles, skills</text>
+  <text x="1630" y="868" text-anchor="middle" class="tiny">profile_skills</text>
+
+  <path class="arrow" d="M335 838 L390 838"/>
+  <path class="arrow" d="M705 820 L760 820"/>
+  <path class="arrow" d="M1075 838 L1130 838"/>
+  <path class="dbArrow" d="M1460 838 L1470 838"/>
+  <text x="723" y="804" class="code">API Gateway routes</text>
+  <text x="1488" y="812" class="code">Repository calls</text>
+
+  <rect x="50" y="1010" width="860" height="280" class="lane"/>
+  <text x="72" y="1040" class="laneTitle">BROWSE SKILL SERVICE FLOW</text>
+
+  <rect x="90" y="1084" width="210" height="82" class="box"/>
+  <text x="195" y="1112" text-anchor="middle" class="label">Search Skills Page</text>
+  <text x="195" y="1135" text-anchor="middle" class="small">Browse/filter skills</text>
+
+  <rect x="355" y="1066" width="245" height="118" class="api"/>
+  <text x="478" y="1094" text-anchor="middle" class="label">Browse APIs</text>
+  <text x="478" y="1119" text-anchor="middle" class="code">GET /api/browse/skills</text>
+  <text x="478" y="1139" text-anchor="middle" class="code">GET /api/browse/skills/search</text>
+  <text x="478" y="1159" text-anchor="middle" class="code">GET /api/browse/profiles</text>
+
+  <rect x="655" y="1066" width="210" height="118" class="service"/>
+  <text x="760" y="1094" text-anchor="middle" class="label">Browse Skill</text>
+  <text x="760" y="1118" text-anchor="middle" class="small">Service</text>
+  <text x="760" y="1141" text-anchor="middle" class="tiny">search/browse/filter</text>
+  <text x="760" y="1162" text-anchor="middle" class="tiny">returns matching profiles</text>
+
+  <ellipse cx="760" cy="1240" rx="120" ry="38" class="db"/>
+  <text x="760" y="1234" text-anchor="middle" class="label">Profile DB</text>
+  <text x="760" y="1254" text-anchor="middle" class="tiny">read skills/profiles</text>
+
+  <path class="arrow" d="M300 1125 L355 1125"/>
+  <path class="arrow" d="M600 1125 L655 1125"/>
+  <path class="dbArrow" d="M760 1184 L760 1202"/>
+
+  <rect x="990" y="1010" width="860" height="280" class="lane"/>
+  <text x="1012" y="1040" class="laneTitle">SKILL SWAP REQUEST SERVICE FLOW</text>
+
+  <rect x="1030" y="1084" width="210" height="82" class="box"/>
+  <text x="1135" y="1112" text-anchor="middle" class="label">Requests Page</text>
+  <text x="1135" y="1135" text-anchor="middle" class="small">Send/accept/reject</text>
+
+  <rect x="1295" y="1058" width="260" height="136" class="api"/>
+  <text x="1425" y="1086" text-anchor="middle" class="label">Request APIs</text>
+  <text x="1425" y="1111" text-anchor="middle" class="code">POST /api/requests</text>
+  <text x="1425" y="1131" text-anchor="middle" class="code">GET /api/requests/user/{id}</text>
+  <text x="1425" y="1151" text-anchor="middle" class="code">PUT /api/requests/{id}/accept</text>
+  <text x="1425" y="1171" text-anchor="middle" class="code">PUT /api/requests/{id}/reject</text>
+
+  <rect x="1610" y="1058" width="205" height="136" class="service"/>
+  <text x="1712" y="1086" text-anchor="middle" class="label">Swap Request</text>
+  <text x="1712" y="1110" text-anchor="middle" class="small">Service</text>
+  <text x="1712" y="1133" text-anchor="middle" class="tiny">validate users/skills</text>
+  <text x="1712" y="1154" text-anchor="middle" class="tiny">store request status</text>
+  <text x="1712" y="1175" text-anchor="middle" class="tiny">PENDING/ACCEPTED/REJECTED</text>
+
+  <ellipse cx="1712" cy="1240" rx="120" ry="38" class="db"/>
+  <text x="1712" y="1234" text-anchor="middle" class="label">Request DB</text>
+  <text x="1712" y="1254" text-anchor="middle" class="tiny">swap_requests</text>
+
+  <path class="arrow" d="M1240 1125 L1295 1125"/>
+  <path class="arrow" d="M1555 1125 L1610 1125"/>
+  <path class="dbArrow" d="M1712 1194 L1712 1202"/>
+
+  <rect x="990" y="1308" width="390" height="54" class="note"/>
+  <text x="1185" y="1330" text-anchor="middle" class="small">Request service checks Auth Service for user identity/JWT</text>
+  <text x="1185" y="1349" text-anchor="middle" class="small">and Profile Service for profile + skill validation</text>
+
+  <path class="softArrow" d="M1610 1192 C1510 1265 1385 1290 1260 1308"/>
+
+  <rect x="50" y="1320" width="860" height="54" class="note"/>
+  <text x="480" y="1342" text-anchor="middle" class="small">Gateway: /api/oauth2/**, /api/users/** -> Auth | /api/profiles/**, /api/skills/** -> Profile</text>
+  <text x="480" y="1361" text-anchor="middle" class="small">Browse Skill and Skill Swap Request are shown as implemented service flows.</text>
+</svg>

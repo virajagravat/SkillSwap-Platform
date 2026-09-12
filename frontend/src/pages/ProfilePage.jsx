@@ -326,6 +326,7 @@ const ProfilePage = () => {
                 <Avatar
                   name={profile?.name || user?.fullName}
                   src={avatarSrc}
+                  fallbackSrc={user?.avatarUrl}
                   size="xl"
                   className="w-24 h-24 sm:w-32 sm:h-32 text-2xl border-2 border-white dark:border-slate-800"
                 />
