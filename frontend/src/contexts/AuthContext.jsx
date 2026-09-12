@@ -6,6 +6,7 @@ const STORAGE_KEY_USER = "skillswap_user";
 const STORAGE_KEY_TOKEN = "skillswap_token";
 
 const BACKEND_BASE_URL = "http://localhost:8085";
+const PROFILE_GATEWAY_BASE_URL = "http://localhost:8086";
 const PROFILE_SERVICE_BASE_URL = "http://localhost:8087";
 
 const getAuthHeaders = (jwtToken) => {
@@ -22,6 +23,19 @@ const getFullPhotoUrl = (photoPath) => {
     return `${PROFILE_SERVICE_BASE_URL}${photoPath}`;
   }
   return `${PROFILE_SERVICE_BASE_URL}/uploads/profiles/${photoPath.replace(/^\/+/, "")}`;
+};
+
+const fetchProfileService = async (path, options = {}) => {
+  try {
+    const gatewayResponse = await fetch(`${PROFILE_GATEWAY_BASE_URL}${path}`, options);
+    if (![502, 503, 504].includes(gatewayResponse.status)) {
+      return gatewayResponse;
+    }
+  } catch (err) {
+    console.warn("Profile gateway unavailable, trying direct profile-service:", err.message);
+  }
+
+  return fetch(`${PROFILE_SERVICE_BASE_URL}${path}`, options);
 };
 
 const normalizeUser = (backendUser = {}) => ({
@@ -43,7 +57,7 @@ export const AuthProvider = ({ children }) => {
   const syncWithProfileService = async (userId, initialUser, jwtToken) => {
     if (!userId) return;
     try {
-      const res = await fetch(`${PROFILE_SERVICE_BASE_URL}/api/profiles/user/${userId}`, {
+      const res = await fetchProfileService(`/api/profiles/user/${userId}`, {
         headers: getAuthHeaders(jwtToken),
       });
       if (res.ok) {
