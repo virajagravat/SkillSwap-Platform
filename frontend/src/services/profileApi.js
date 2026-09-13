@@ -3,7 +3,7 @@ const DIRECT_URL = 'http://localhost:8087';
 const PHOTO_BASE_URL = DIRECT_URL;
 const STORAGE_KEY_TOKEN = 'skillswap_token';
 
-const getAuthHeaders = () => {
+export const getAuthHeaders = () => {
   const token = localStorage.getItem(STORAGE_KEY_TOKEN);
   return token ? { Authorization: `Bearer ${token}` } : {};
 };

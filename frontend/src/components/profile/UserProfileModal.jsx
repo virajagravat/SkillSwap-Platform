@@ -6,7 +6,7 @@ import Avatar from '../ui/Avatar';
 import Badge from '../ui/Badge';
 import { getProfileByUserId, getProfileSkills, getFullPhotoUrl } from '../../services/profileApi';
 
-const UserProfileModal = ({ isOpen, onClose, userId, teacherName, offeredSkillName, onSendSwapRequest }) => {
+const UserProfileModal = ({ isOpen, onClose, userId, teacherName, offeredSkillId, offeredSkillName, onSendSwapRequest }) => {
   const [profileData, setProfileData] = useState(null);
   const [userSkills, setUserSkills] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -96,7 +96,7 @@ const UserProfileModal = ({ isOpen, onClose, userId, teacherName, offeredSkillNa
               leftIcon={<Send className="w-4 h-4" />}
               onClick={() => {
                 onClose();
-                onSendSwapRequest?.(profileData?.name || teacherName, offeredSkillName);
+                onSendSwapRequest?.(profileData?.name || teacherName, offeredSkillName, userId, offeredSkillId);
               }}
               className="shadow-md"
             >
