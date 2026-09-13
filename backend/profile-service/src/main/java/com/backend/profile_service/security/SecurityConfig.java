@@ -41,6 +41,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()          // pre‑flight
                     .requestMatchers("/", "/login/**", "/oauth2/**", "/api/oauth2/**", "/uploads/**")
                         .permitAll()                                                // public
+                    .requestMatchers(HttpMethod.GET, "/api/skills/**").permitAll()
                     .requestMatchers("/api/profiles/**").authenticated()
                     .anyRequest().authenticated())                                 // everything else
             // Register our JWT filter before the default authentication filter
