@@ -1,7 +1,7 @@
 const BASE_URL = 'http://localhost:8087';
 const STORAGE_KEY_TOKEN = 'skillswap_token';
 
-const getAuthHeaders = () => {
+export const getAuthHeaders = () => {
   const token = localStorage.getItem(STORAGE_KEY_TOKEN);
   return token ? { Authorization: `Bearer ${token}` } : {};
 };

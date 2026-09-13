@@ -6,7 +6,10 @@ import Avatar from '../components/ui/Avatar';
 import Badge from '../components/ui/Badge';
 import Input from '../components/ui/Input';
 import { useToast } from '../contexts/ToastContext';
-import { searchBrowseSkills, getFullPhotoUrl } from '../services/browseSkillApi';
+import { useContext } from 'react';
+import { AuthContext } from '../contexts/AuthContext';
+import { createSkillSwapRequest } from '../services/skillSwapRequestApi';
+import SwapRequestDialog from '../components/skill-swap/SwapRequestDialog';
 import UserProfileModal from '../components/profile/UserProfileModal';
 
 const SearchSkillsPage = () => {
@@ -89,16 +92,66 @@ const SearchSkillsPage = () => {
     });
   };
 
-  // Handler for Send Swap Request action (Placeholder as instructed)
-  const handleSendSwapRequest = (teacherName, skillName) => {
-    showToast({
-      message: `Swap Request feature coming soon in Module 5! (Requesting ${skillName} from ${teacherName})`,
-      type: 'info',
-      duration: 5000,
-    });
+// State for swap request dialog
+  const { user } = useContext(AuthContext);
+  const [swapDialogOpen, setSwapDialogOpen] = useState(false);
+  const [selectedSwap, setSelectedSwap] = useState(null); // { userId, name, skillId, skillName }
+
+  // Open dialog with selected teacher/skill
+  const openSwapDialog = (item) => {
+    setSelectedSwap(item);
+    setSwapDialogOpen(true);
   };
 
+  // Confirm handler – sends request to backend
+  const handleConfirmSwap = async (payload) => {
+    try {
+      await createSkillSwapRequest(payload);
+      showToast({
+        message: `Swap request sent to ${payload.receiverId}.`,
+        type: 'success',
+        duration: 5000,
+      });
+    } catch (e) {
+      const friendly = (() => {
+        if (e.message.includes('already exists')) return 'You already sent a request to this teacher for this skill.';
+        if (e.message.includes('cannot send to yourself')) return 'You cannot send a request to yourself.';
+        if (e.message.includes('End time must be after start time'))
+          return 'End time must be after start time.';
+        return 'Unable to send request. Please try again.';
+      })();
+      showToast({ message: friendly, type: 'error', duration: 5000 });
+    } finally {
+      setSwapDialogOpen(false);
+      setSelectedSwap(null);
+    }
+  };
+
+  // Updated placeholder – now opens dialog
+  const handleSendSwapRequest = (teacherName, skillName, teacherId, skillId) => {
+    openSwapDialog({ userId: teacherId, name: teacherName, skillId, skillName });
+  };
+
+  // ... existing code continues ...
+
+  // At the bottom of the return JSX, just before closing </div>
   return (
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      {/* ... existing markup ... */}
+      {/* Render Swap Request Dialog */}
+      {selectedSwap && (
+        <SwapRequestDialog
+          open={swapDialogOpen}
+          onClose={() => setSwapDialogOpen(false)}
+          teacherId={selectedSwap.userId}
+          teacherName={selectedSwap.name}
+          skillId={selectedSwap.skillId}
+          skillName={selectedSwap.skillName}
+          onConfirm={handleConfirmSwap}
+        />
+      )}
+    </div>
+  );
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

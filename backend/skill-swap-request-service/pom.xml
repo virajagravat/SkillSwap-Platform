@@ -113,6 +113,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				 <configuration>
+					<mainClass>com.backend.skill_swap_request_service.SkillSwapRequestServiceApplication</mainClass>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

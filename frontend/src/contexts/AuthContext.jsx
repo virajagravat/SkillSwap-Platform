@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 const STORAGE_KEY_USER = "skillswap_user";
 const STORAGE_KEY_TOKEN = "skillswap_token";
