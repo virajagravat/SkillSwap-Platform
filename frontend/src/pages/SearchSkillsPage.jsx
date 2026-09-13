@@ -6,6 +6,7 @@ import Avatar from '../components/ui/Avatar';
 import Badge from '../components/ui/Badge';
 import Input from '../components/ui/Input';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../contexts/AuthContext';
 import { searchBrowseSkills, getFullPhotoUrl } from '../services/browseSkillApi';
 import { createSkillSwapRequest } from '../services/skillSwapRequestApi';
 import SwapRequestDialog from '../components/skill-swap/SwapRequestDialog';
@@ -31,6 +32,7 @@ const SearchSkillsPage = () => {
   const [error, setError] = useState(null);
 
   const { showToast } = useToast();
+  const { user } = useAuth();
   const searchInputRef = useRef(null);
 
   // Debounce search query input (350ms)
@@ -104,8 +106,20 @@ const SearchSkillsPage = () => {
 
   // Confirm handler – sends request to backend
   const handleConfirmSwap = async (payload) => {
+    if (!user?.id) {
+      showToast({
+        message: 'Please log in before sending a swap request.',
+        type: 'error',
+        duration: 5000,
+      });
+      return;
+    }
+
     try {
-      await createSkillSwapRequest(payload);
+      await createSkillSwapRequest({
+        ...payload,
+        senderId: user.id,
+      });
       showToast({
         message: `Swap request sent to ${payload.receiverId}.`,
         type: 'success',
