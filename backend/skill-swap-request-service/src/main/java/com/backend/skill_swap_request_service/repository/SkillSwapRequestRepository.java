@@ -14,7 +14,10 @@ public interface SkillSwapRequestRepository
         extends JpaRepository<SkillSwapRequest, Long> {
     /** All requests where the given user is the receiver */
     List<SkillSwapRequest> findByReceiverId(UUID receiverId);
+
     /** All requests where the given user is the sender */
+    List<SkillSwapRequest> findBySenderId(UUID senderId);
+
     /** Check for duplicate request */
     boolean existsBySenderIdAndReceiverIdAndSkillId(UUID senderId, UUID receiverId, UUID skillId);
 }
