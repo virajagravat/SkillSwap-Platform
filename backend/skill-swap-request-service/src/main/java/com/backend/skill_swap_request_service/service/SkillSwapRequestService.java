@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -27,7 +26,7 @@ public class SkillSwapRequestService {
     private final SkillSwapRequestRepository repository;
 
     @Transactional
-    public SkillSwapRequestResponseDto createRequest(CreateRequestDto dto, UUID senderId, UUID receiverId) {
+    public SkillSwapRequestResponseDto createRequest(CreateRequestDto dto, Long senderId, Long receiverId) {
         // Duplicate request check
         if (repository.existsBySenderIdAndReceiverIdAndSkillId(senderId, receiverId, dto.getSkillId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Duplicate skill‑swap request already exists");
@@ -56,20 +55,20 @@ public class SkillSwapRequestService {
         return mapToResponse(request);
     }
 
-    public List<SkillSwapRequestResponseDto> getSentRequests(UUID senderId) {
+    public List<SkillSwapRequestResponseDto> getSentRequests(Long senderId) {
         return repository.findBySenderId(senderId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
-    public List<SkillSwapRequestResponseDto> getReceivedRequests(UUID receiverId) {
+    public List<SkillSwapRequestResponseDto> getReceivedRequests(Long receiverId) {
         return repository.findByReceiverId(receiverId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public SkillSwapRequestResponseDto suggestTime(Long requestId, SuggestTimeDto dto, UUID receiverId) {
+    public SkillSwapRequestResponseDto suggestTime(Long requestId, SuggestTimeDto dto, Long receiverId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         if (!request.getReceiverId().equals(receiverId)) {
@@ -87,7 +86,7 @@ public class SkillSwapRequestService {
 
     // ---------- Additional actions ----------
     @Transactional
-    public SkillSwapRequestResponseDto schedule(Long requestId, SuggestTimeDto dto, UUID schedulerId) {
+    public SkillSwapRequestResponseDto schedule(Long requestId, SuggestTimeDto dto, Long schedulerId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         // only participants can schedule
@@ -103,7 +102,7 @@ public class SkillSwapRequestService {
     }
 
     @Transactional
-    public SkillSwapRequestResponseDto accept(Long requestId, UUID userId) {
+    public SkillSwapRequestResponseDto accept(Long requestId, Long userId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         request.setStatus(RequestStatus.ACCEPTED);
@@ -112,7 +111,7 @@ public class SkillSwapRequestService {
     }
 
     @Transactional
-    public SkillSwapRequestResponseDto reject(Long requestId, UUID userId) {
+    public SkillSwapRequestResponseDto reject(Long requestId, Long userId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         request.setStatus(RequestStatus.REJECTED);
@@ -121,7 +120,7 @@ public class SkillSwapRequestService {
     }
 
     @Transactional
-    public SkillSwapRequestResponseDto cancel(Long requestId, UUID userId) {
+    public SkillSwapRequestResponseDto cancel(Long requestId, Long userId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         request.setStatus(RequestStatus.CANCELLED);
@@ -130,7 +129,7 @@ public class SkillSwapRequestService {
     }
 
     @Transactional
-    public SkillSwapRequestResponseDto complete(Long requestId, UUID userId) {
+    public SkillSwapRequestResponseDto complete(Long requestId, Long userId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         request.setStatus(RequestStatus.COMPLETED);
