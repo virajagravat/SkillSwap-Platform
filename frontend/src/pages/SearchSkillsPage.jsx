@@ -6,8 +6,7 @@ import Avatar from '../components/ui/Avatar';
 import Badge from '../components/ui/Badge';
 import Input from '../components/ui/Input';
 import { useToast } from '../contexts/ToastContext';
-import { useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
+import { searchBrowseSkills, getFullPhotoUrl } from '../services/browseSkillApi';
 import { createSkillSwapRequest } from '../services/skillSwapRequestApi';
 import SwapRequestDialog from '../components/skill-swap/SwapRequestDialog';
 import UserProfileModal from '../components/profile/UserProfileModal';
@@ -88,12 +87,12 @@ const SearchSkillsPage = () => {
     setSelectedTeacher({
       userId: teacherItem.userId,
       name: teacherItem.name,
+      skillId: teacherItem.skillId,
       skillName: teacherItem.skillName,
     });
   };
 
-// State for swap request dialog
-  const { user } = useContext(AuthContext);
+  // State for swap request dialog
   const [swapDialogOpen, setSwapDialogOpen] = useState(false);
   const [selectedSwap, setSelectedSwap] = useState(null); // { userId, name, skillId, skillName }
 
@@ -132,26 +131,7 @@ const SearchSkillsPage = () => {
     openSwapDialog({ userId: teacherId, name: teacherName, skillId, skillName });
   };
 
-  // ... existing code continues ...
-
-  // At the bottom of the return JSX, just before closing </div>
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      {/* ... existing markup ... */}
-      {/* Render Swap Request Dialog */}
-      {selectedSwap && (
-        <SwapRequestDialog
-          open={swapDialogOpen}
-          onClose={() => setSwapDialogOpen(false)}
-          teacherId={selectedSwap.userId}
-          teacherName={selectedSwap.name}
-          skillId={selectedSwap.skillId}
-          skillName={selectedSwap.skillName}
-          onConfirm={handleConfirmSwap}
-        />
-      )}
-    </div>
-  );
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -339,7 +319,7 @@ const SearchSkillsPage = () => {
                     size="sm"
                     className="w-full text-xs font-semibold"
                     leftIcon={<Send className="w-3.5 h-3.5" />}
-                    onClick={() => handleSendSwapRequest(item.name, item.skillName)}
+                    onClick={() => handleSendSwapRequest(item.name, item.skillName, item.userId, item.skillId)}
                   >
                     Send Swap Request
                   </Button>
@@ -405,9 +385,21 @@ const SearchSkillsPage = () => {
         onClose={() => setSelectedTeacher(null)}
         userId={selectedTeacher?.userId}
         teacherName={selectedTeacher?.name}
+        offeredSkillId={selectedTeacher?.skillId}
         offeredSkillName={selectedTeacher?.skillName}
         onSendSwapRequest={handleSendSwapRequest}
       />
+      {selectedSwap && (
+        <SwapRequestDialog
+          open={swapDialogOpen}
+          onClose={() => setSwapDialogOpen(false)}
+          teacherId={selectedSwap.userId}
+          teacherName={selectedSwap.name}
+          skillId={selectedSwap.skillId}
+          skillName={selectedSwap.skillName}
+          onConfirm={handleConfirmSwap}
+        />
+      )}
     </div>
   );
 };
