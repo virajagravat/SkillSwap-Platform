@@ -3,7 +3,6 @@ package com.backend.skill_swap_request_service.dto.request;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.time.*;
-import java.util.UUID;
 
 /**
  * DTO used when a requester creates a new skill‑swap request.
@@ -12,10 +11,13 @@ import java.util.UUID;
 public class CreateRequestDto {
 
     @NotNull(message = "skillId is required")
-    private UUID skillId;
+    private Long skillId;
+
+    @NotNull(message = "senderId is required")
+    private Long senderId;
 
     @NotNull(message = "receiverId is required")
-    private UUID receiverId;
+    private Long receiverId;
 
     @NotNull(message = "requestedDate is required")
     @FutureOrPresent(message = "requestedDate must be today or in the future")

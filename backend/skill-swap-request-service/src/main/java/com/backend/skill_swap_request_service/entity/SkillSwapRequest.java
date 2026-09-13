@@ -8,7 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 
 import java.time.*;
-import java.util.UUID;
 @Entity
 @Table(name = "skill_swap_requests")
 @Data                         // getters, setters, toString, equals, hashCode
@@ -20,14 +19,14 @@ public class SkillSwapRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     /** User who **sent** the request – taken from the JWT principal */
-    @Column(name = "sender_id", nullable = false, columnDefinition = "uuid")
-    private UUID senderId;
+    @Column(name = "sender_id", nullable = false)
+    private Long senderId;
     /** User who will **receive** the request */
-    @Column(name = "receiver_id", nullable = false, columnDefinition = "uuid")
-    private UUID receiverId;
+    @Column(name = "receiver_id", nullable = false)
+    private Long receiverId;
     /** Skill that is being requested */
-    @Column(name = "skill_id", nullable = false, columnDefinition = "uuid")
-    private UUID skillId;
+    @Column(name = "skill_id", nullable = false)
+    private Long skillId;
     /** Optional free‑form message from the requester */
     @Column(length = 500)
     private String message;
