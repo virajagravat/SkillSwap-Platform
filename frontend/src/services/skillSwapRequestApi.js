@@ -18,7 +18,9 @@ const handleResponse = async (response) => {
     let errorMessage = `HTTP Error ${response.status}`;
     try {
       const parsed = JSON.parse(errorText);
-      errorMessage = parsed.message || parsed.error || errorMessage;
+      // Spring Boot ProblemDetail responses put the useful API text in
+      // `detail`; without it, a 409 duplicate is shown as a generic error.
+      errorMessage = parsed.detail || parsed.message || parsed.error || errorMessage;
     } catch {
       if (errorText) errorMessage = errorText;
     }
