@@ -22,7 +22,9 @@ const handleResponse = async (response) => {
     } catch {
       if (errorText) errorMessage = errorText;
     }
-    throw new Error(errorMessage);
+    const error = new Error(errorMessage);
+    error.status = response.status;
+    throw error;
   }
 
   const text = await response.text();
@@ -44,6 +46,11 @@ export const createSkillSwapRequest = async (requestData) => {
   try {
     return await postJson(GATEWAY_URL, path, requestData);
   } catch (gatewayError) {
+    // A response from the gateway (for example 400, 401, or 409) is a real
+    // application error. Only fall back when the gateway is unavailable.
+    if (gatewayError.status && ![502, 503, 504].includes(gatewayError.status)) {
+      throw gatewayError;
+    }
     console.warn('API Gateway unreachable for Skill Swap Request Service, trying direct port:', gatewayError.message);
     return postJson(DIRECT_URL, path, requestData);
   }
