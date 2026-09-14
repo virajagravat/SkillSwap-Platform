@@ -30,6 +30,7 @@ export const SwapRequestDialog = ({
   const [requestedEndTime, setRequestedEndTime] = useState('');
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetForm = () => {
     setRequestedDate('');
@@ -53,7 +54,7 @@ export const SwapRequestDialog = ({
   };
 
   const handleSubmit = async () => {
-    if (!validate()) return;
+    if (isSubmitting || !validate()) return;
     const payload = {
       skillId,
       receiverId: teacherId,
@@ -63,8 +64,10 @@ export const SwapRequestDialog = ({
       message: message.trim(),
     };
     try {
+      setIsSubmitting(true);
       await onConfirm(payload);
     } finally {
+      setIsSubmitting(false);
       resetForm();
       onClose();
     }
@@ -146,8 +149,8 @@ export const SwapRequestDialog = ({
           </div>
         </div>
         <div className="flex justify-end gap-3 border-t border-slate-100 px-6 py-4 dark:border-surface-border-dark">
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSubmit}>Send Request</Button>
+          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
+          <Button onClick={handleSubmit} isLoading={isSubmitting}>Send Request</Button>
         </div>
       </div>
     </div>
