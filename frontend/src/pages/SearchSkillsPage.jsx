@@ -127,6 +127,8 @@ const SearchSkillsPage = () => {
       });
     } catch (e) {
       const friendly = (() => {
+        if (e.status === 401) return 'Your session has expired. Please log in again.';
+        if (e.status === 403) return 'You are not authorised to send this request.';
         if (e.message.includes('already exists')) return 'You already sent a request to this teacher for this skill.';
         if (e.message.includes('cannot send to yourself')) return 'You cannot send a request to yourself.';
         if (e.message.includes('End time must be after start time'))

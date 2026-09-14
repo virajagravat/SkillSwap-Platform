@@ -27,6 +27,9 @@ public class SkillSwapRequestService {
 
     @Transactional
     public SkillSwapRequestResponseDto createRequest(CreateRequestDto dto, Long senderId, Long receiverId) {
+        if (senderId.equals(receiverId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot send a skill-swap request to yourself");
+        }
         // Duplicate request check
         if (repository.existsBySenderIdAndReceiverIdAndSkillId(senderId, receiverId, dto.getSkillId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Duplicate skill‑swap request already exists");
