@@ -237,6 +237,7 @@ const ProfilePage = () => {
   const handleSelectSkillToAdd = async (skillItem) => {
     setAddingSkill(true);
     try {
+      const profileId = await ensureProfileId();
       let targetSkill = skillItem;
 
       // If user typed a new skill name that doesn't exist in search results
@@ -244,11 +245,11 @@ const ProfilePage = () => {
         targetSkill = await createSkill(skillItem.trim());
       }
 
-      await addSkillToProfile(profile.id, targetSkill.id, skillTypeToAdd);
+      await addSkillToProfile(profileId, targetSkill.id, skillTypeToAdd);
       showToast(`Added "${targetSkill.name}" to skills!`, 'success');
       
       // Reload skills list
-      const updatedSkills = await getProfileSkills(profile.id);
+      const updatedSkills = await getProfileSkills(profileId);
       setSkills(updatedSkills || []);
       setIsAddSkillModalOpen(false);
       setSearchQuery('');
@@ -261,10 +262,11 @@ const ProfilePage = () => {
   };
 
   // Remove Skill from Profile
-  const handleRemoveSkill = async (skillId, skillName) => {
+  const handleRemoveSkill = async (profileSkillId, skillId, skillName, skillType) => {
     try {
-      await removeSkillFromProfile(profile.id, skillId);
-      setSkills((prev) => prev.filter((item) => item.skill.id !== skillId));
+      const profileId = await ensureProfileId();
+      await removeSkillFromProfile(profileId, skillId, skillType);
+      setSkills((prev) => prev.filter((item) => item.id !== profileSkillId));
       showToast(`Removed "${skillName}"`, 'info');
     } catch (error) {
       console.error('Remove skill error:', error);
@@ -513,7 +515,7 @@ const ProfilePage = () => {
                   <span>{item.skill?.name}</span>
                   <button
                     type="button"
-                    onClick={() => handleRemoveSkill(item.skill.id, item.skill.name)}
+                    onClick={() => handleRemoveSkill(item.id, item.skill.id, item.skill.name, item.skillType)}
                     className="opacity-60 hover:opacity-100 p-0.5 hover:bg-emerald-200/60 dark:hover:bg-emerald-900 rounded-full transition-all"
                     title="Remove skill"
                   >
@@ -580,7 +582,7 @@ const ProfilePage = () => {
                   <span>{item.skill?.name}</span>
                   <button
                     type="button"
-                    onClick={() => handleRemoveSkill(item.skill.id, item.skill.name)}
+                    onClick={() => handleRemoveSkill(item.id, item.skill.id, item.skill.name, item.skillType)}
                     className="opacity-60 hover:opacity-100 p-0.5 hover:bg-terracotta-200/60 dark:hover:bg-terracotta-900 rounded-full transition-all"
                     title="Remove skill"
                   >
