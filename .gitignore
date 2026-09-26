@@ -7,3 +7,11 @@ backend/auth-service/src/main/resources/
 .vscode
 
 D:\mcasem3\Antigravity\SkillSwap-Platform\SkillSwap-Architecture-Diagram.svg
+D:\mcasem3\Antigravity\SkillSwap-Platform\api-gateway.log
+D:\mcasem3\Antigravity\SkillSwap-Platform\auth-service.log
+D:\mcasem3\Antigravity\SkillSwap-Platform\browse-skill-service.log
+D:\mcasem3\Antigravity\SkillSwap-Platform\profile-service.log
+D:\mcasem3\Antigravity\SkillSwap-Platform\service-registry.log
+D:\mcasem3\Antigravity\SkillSwap-Platform\skill-swap-request-service.log
+D:\mcasem3\Antigravity\SkillSwap-Platform\start-services.ps1
+D:\mcasem3\Antigravity\SkillSwap-Platform\start-services.sh

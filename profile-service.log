@@ -1,0 +1,130 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.backend:profile-service:jar:0.0.1-SNAPSHOT
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.springframework.boot:spring-boot-starter-oauth2-client:jar -> duplicate declaration of version (?) @ line 124, column 21
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.springframework.boot:spring-boot-starter-oauth2-resource-server:jar -> duplicate declaration of version (?) @ line 128, column 21
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] 
+[INFO] --------------------< com.backend:profile-service >---------------------
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:4.1.0:run (default-cli) > test-compile @ profile-service >>>
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ profile-service ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ profile-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ profile-service ---
+[INFO] skip non existing resourceDirectory D:\mcasem3\Antigravity\SkillSwap-Platform\backend\profile-service\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ profile-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:4.1.0:run (default-cli) < test-compile @ profile-service <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.1.0:run (default-cli) @ profile-service ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.0)
+
+2026-09-26T11:39:01.687+05:30  INFO 14260 --- [profile-service] [  restartedMain] c.b.p.ProfileServiceApplication          : Starting ProfileServiceApplication using Java 21.0.10 with PID 14260 (D:\mcasem3\Antigravity\SkillSwap-Platform\backend\profile-service\target\classes started by admin in D:\mcasem3\Antigravity\SkillSwap-Platform\backend\profile-service)
+2026-09-26T11:39:01.695+05:30  INFO 14260 --- [profile-service] [  restartedMain] c.b.p.ProfileServiceApplication          : No active profile set, falling back to 1 default profile: "default"
+2026-09-26T11:39:01.958+05:30  INFO 14260 --- [profile-service] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-09-26T11:39:01.958+05:30  INFO 14260 --- [profile-service] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-09-26T11:39:05.666+05:30  INFO 14260 --- [profile-service] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-09-26T11:39:06.282+05:30  INFO 14260 --- [profile-service] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 593 ms. Found 3 JPA repository interfaces.
+2026-09-26T11:39:07.932+05:30  INFO 14260 --- [profile-service] [  restartedMain] o.s.cloud.context.scope.GenericScope     : BeanFactory id=0d8c61f3-07cb-3e6a-8da8-920a1df7b388
+2026-09-26T11:39:11.990+05:30  INFO 14260 --- [profile-service] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8087 (http)
+2026-09-26T11:39:12.107+05:30  INFO 14260 --- [profile-service] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-09-26T11:39:12.108+05:30  INFO 14260 --- [profile-service] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
+2026-09-26T11:39:12.324+05:30  INFO 14260 --- [profile-service] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 10363 ms
+2026-09-26T11:39:13.197+05:30  INFO 14260 --- [profile-service] [  restartedMain] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-09-26T11:39:13.471+05:30  INFO 14260 --- [profile-service] [  restartedMain] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.1.Final
+2026-09-26T11:39:14.978+05:30  INFO 14260 --- [profile-service] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-09-26T11:39:15.098+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-09-26T11:39:17.030+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5b69d11f
+2026-09-26T11:39:17.033+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-09-26T11:39:17.237+05:30  WARN 14260 --- [profile-service] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-09-26T11:39:17.682+05:30  INFO 14260 --- [profile-service] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://ep-misty-scene-azuktg60-pooler.c-3.ap-southeast-1.aws.neon.tech/skillswap_profile_db?sslmode=require&channelBinding=require]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: skillswap_profile_db/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-09-26T11:39:20.574+05:30  INFO 14260 --- [profile-service] [  restartedMain] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-09-26T11:39:21.506+05:30  INFO 14260 --- [profile-service] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-09-26T11:39:21.680+05:30  INFO 14260 --- [profile-service] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-09-26T11:39:22.321+05:30  WARN 14260 --- [profile-service] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-09-26T11:39:22.594+05:30 DEBUG 14260 --- [profile-service] [  restartedMain] swordEncoderAuthenticationManagerBuilder : No authenticationProviders and no parentAuthenticationManager defined. Returning null.
+2026-09-26T11:39:23.221+05:30 DEBUG 14260 --- [profile-service] [  restartedMain] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, JwtAuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-09-26T11:39:23.854+05:30  INFO 14260 --- [profile-service] [  restartedMain] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestClient.
+2026-09-26T11:39:23.928+05:30  WARN 14260 --- [profile-service] [  restartedMain] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2026-09-26T11:39:23.965+05:30  INFO 14260 --- [profile-service] [  restartedMain] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2026-09-26T11:39:24.004+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
+2026-09-26T11:39:24.010+05:30  INFO 14260 --- [profile-service] [  restartedMain] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-09-26T11:39:24.026+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Disable delta property : false
+2026-09-26T11:39:24.026+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Single vip registry refresh property : null
+2026-09-26T11:39:24.026+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Force full registry fetch : false
+2026-09-26T11:39:24.027+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Application is null : false
+2026-09-26T11:39:24.027+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Registered Applications size is zero : true
+2026-09-26T11:39:24.027+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Application version is -1: true
+2026-09-26T11:39:24.027+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Getting all instance registry info from the eureka server
+2026-09-26T11:39:24.797+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : The response status is 200
+2026-09-26T11:39:24.801+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Starting heartbeat executor: renew interval is: 30
+2026-09-26T11:39:24.804+05:30  INFO 14260 --- [profile-service] [  restartedMain] c.n.discovery.InstanceInfoReplicator     : InstanceInfoReplicator onDemand update allowed rate per min is 4
+2026-09-26T11:39:24.807+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1790402964806 with initial instances count: 5
+2026-09-26T11:39:24.820+05:30  INFO 14260 --- [profile-service] [  restartedMain] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application PROFILE-SERVICE with eureka with status UP
+2026-09-26T11:39:24.820+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1790402964820, current=UP, previous=STARTING]
+2026-09-26T11:39:24.825+05:30  INFO 14260 --- [profile-service] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_PROFILE-SERVICE/DESKTOP-SD50FSL.mshome.net:profile-service:8087: registering service...
+2026-09-26T11:39:24.836+05:30  INFO 14260 --- [profile-service] [  restartedMain] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application PROFILE-SERVICE with eureka with status DOWN
+2026-09-26T11:39:24.836+05:30  INFO 14260 --- [profile-service] [  restartedMain] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1790402964836, current=DOWN, previous=UP]
+2026-09-26T11:39:24.837+05:30  WARN 14260 --- [profile-service] [  restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerSt2026-09-26T11:39:37.878+05:30  INFO 6564 --- [profile-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_PROFILE-SERVICE/DESKTOP-SD50FSL.mshome.net:profile-service:8087 - Re-registering apps/PROFILE-SERVICE
+2026-09-26T11:39:37.879+05:30  INFO 6564 --- [profile-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_PROFILE-SERVICE/DESKTOP-SD50FSL.mshome.net:profile-service:8087: registering service...
+2026-09-26T11:39:37.884+05:30  INFO 6564 --- [profile-service] [beatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_PROFILE-SERVICE/DESKTOP-SD50FSL.mshome.net:profile-service:8087 - registration status: 204
+2026-09-26T11:42:36.799+05:30  INFO 6564 --- [profile-service] [rap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-09-26T11:42:59.726+05:30  INFO 6564 --- [profile-service] [nio-8087-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-09-26T11:42:59.726+05:30  INFO 6564 --- [profile-service] [nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-09-26T11:42:59.751+05:30  INFO 6564 --- [profile-service] [nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 25 ms
+2026-09-26T11:42:59.777+05:30 DEBUG 6564 --- [profile-service] [nio-8087-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /api/profiles/user/4
+2026-09-26T11:43:00.117+05:30  INFO 6564 --- [profile-service] [nio-8087-exec-2] c.b.p.s.jwt.JwtAuthenticationFilter      : Authenticated request – principal=alkeshbakotiya000@gmail.com, authorities=[ROLE_USER]
+2026-09-26T11:43:00.123+05:30 DEBUG 6564 --- [profile-service] [nio-8087-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /api/profiles/user/4
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.created_at,
+        p1_0.name,
+        p1_0.profile_photo,
+        p1_0.updated_at,
+        p1_0.user_id 
+    from
+        profiles p1_0 
+    where
+        p1_0.user_id=?
+2026-09-26T11:43:01.318+05:30 DEBUG 6564 --- [profile-service] [nio-8087-exec-3] o.s.security.web.FilterChainProxy        : Securing GET /uploads/profiles/439eaf2c-de64-419b-a7d5-08659695d191.jpg
+2026-09-26T11:43:01.326+05:30 DEBUG 6564 --- [profile-service] [nio-8087-exec-3] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2026-09-26T11:43:01.326+05:30 DEBUG 6564 --- [profile-service] [nio-8087-exec-3] o.s.s.w.session.SessionManagementFilter  : Request requested invalid session id 688DA2CDE6BCD67C973784ABCA162D02
+2026-09-26T11:43:01.326+05:30 DEBUG 6564 --- [profile-service] [nio-8087-exec-3] o.s.security.web.FilterChainProxy        : Secured GET /uploads/profiles/439eaf2c-de64-419b-a7d5-08659695d191.jpg
+2026-09-26T11:43:05.907+05:
