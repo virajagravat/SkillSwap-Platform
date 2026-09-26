@@ -7,6 +7,7 @@ import com.backend.skill_swap_request_service.entity.SkillSwapRequest;
 import com.backend.skill_swap_request_service.enums.RequestStatus;
 import com.backend.skill_swap_request_service.exception.RequestNotFoundException;
 import com.backend.skill_swap_request_service.repository.SkillSwapRequestRepository;
+import com.backend.skill_swap_request_service.repository.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class SkillSwapRequestService {
 
     private final SkillSwapRequestRepository repository;
+    private final com.backend.skill_swap_request_service.repository.SkillRepository skillRepository;
 
     @Transactional
     public SkillSwapRequestResponseDto createRequest(CreateRequestDto dto, Long senderId, Long receiverId) {
@@ -33,6 +35,10 @@ public class SkillSwapRequestService {
         // Duplicate request check
         if (repository.existsBySenderIdAndReceiverIdAndSkillId(senderId, receiverId, dto.getSkillId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Duplicate skill‑swap request already exists");
+        }
+        // Verify that the requested skill exists
+        if (!skillRepository.existsById(dto.getSkillId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found");
         }
         // Validate that end time is after start time
         if (!dto.getRequestedEndTime().isAfter(dto.getRequestedStartTime())) {
