@@ -7,43 +7,51 @@ import com.backend.skill_swap_request_service.entity.SkillSwapRequest;
 import com.backend.skill_swap_request_service.enums.RequestStatus;
 import com.backend.skill_swap_request_service.exception.RequestNotFoundException;
 import com.backend.skill_swap_request_service.repository.SkillSwapRequestRepository;
-import com.backend.skill_swap_request_service.repository.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service layer containing the core business rules for skill‑swap requests.
+ * Service layer containing the core business rules for skill-swap requests.
  */
 @Service
 @RequiredArgsConstructor
 public class SkillSwapRequestService {
 
     private final SkillSwapRequestRepository repository;
-    private final com.backend.skill_swap_request_service.repository.SkillRepository skillRepository;
+
+    private static final List<RequestStatus> ACTIVE_DUPLICATE_STATUSES = List.of(
+            RequestStatus.PENDING,
+            RequestStatus.TIME_SUGGESTED,
+            RequestStatus.PARTICIPANT_SUGGESTED,
+            RequestStatus.SCHEDULED,
+            RequestStatus.ACCEPTED
+    );
 
     @Transactional
     public SkillSwapRequestResponseDto createRequest(CreateRequestDto dto, Long senderId, Long receiverId) {
         if (senderId.equals(receiverId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot send a skill-swap request to yourself");
         }
-        // Duplicate request check
-        if (repository.existsBySenderIdAndReceiverIdAndSkillId(senderId, receiverId, dto.getSkillId())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Duplicate skill‑swap request already exists");
+
+        if (repository.existsBySenderIdAndReceiverIdAndSkillIdAndStatusIn(
+                senderId,
+                receiverId,
+                dto.getSkillId(),
+                ACTIVE_DUPLICATE_STATUSES
+        )) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Duplicate skill-swap request already exists");
         }
-        // Verify that the requested skill exists
-        if (!skillRepository.existsById(dto.getSkillId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found");
-        }
-        // Validate that end time is after start time
-        if (!dto.getRequestedEndTime().isAfter(dto.getRequestedStartTime())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "End time must be after start time");
-        }
+
+        validateTimeWindow(dto.getRequestedStartTime(), dto.getRequestedEndTime());
+
         SkillSwapRequest request = SkillSwapRequest.builder()
                 .senderId(senderId)
                 .receiverId(receiverId)
@@ -54,6 +62,7 @@ public class SkillSwapRequestService {
                 .message(dto.getMessage())
                 .status(RequestStatus.PENDING)
                 .build();
+
         SkillSwapRequest saved = repository.save(request);
         return mapToResponse(saved);
     }
@@ -81,8 +90,9 @@ public class SkillSwapRequestService {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         if (!request.getReceiverId().equals(receiverId)) {
-            throw new IllegalArgumentException("Only the receiver can suggest a new time");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the receiver can suggest a new time");
         }
+        validateTimeWindow(dto.getSuggestedStartTime(), dto.getSuggestedEndTime());
         request.setRequestedDate(dto.getSuggestedDate());
         request.setRequestedStartTime(dto.getSuggestedStartTime());
         request.setRequestedEndTime(dto.getSuggestedEndTime());
@@ -93,15 +103,14 @@ public class SkillSwapRequestService {
         return mapToResponse(saved);
     }
 
-    // ---------- Additional actions ----------
     @Transactional
     public SkillSwapRequestResponseDto schedule(Long requestId, SuggestTimeDto dto, Long schedulerId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
-        // only participants can schedule
         if (!request.getSenderId().equals(schedulerId) && !request.getReceiverId().equals(schedulerId)) {
-            throw new IllegalArgumentException("Only participants can schedule the request");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only participants can schedule the request");
         }
+        validateTimeWindow(dto.getSuggestedStartTime(), dto.getSuggestedEndTime());
         request.setProposedDate(dto.getSuggestedDate());
         request.setProposedStartTime(dto.getSuggestedStartTime());
         request.setProposedEndTime(dto.getSuggestedEndTime());
@@ -114,6 +123,9 @@ public class SkillSwapRequestService {
     public SkillSwapRequestResponseDto accept(Long requestId, Long userId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
+        if (!request.getReceiverId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the receiver can accept the request");
+        }
         request.setStatus(RequestStatus.ACCEPTED);
         request.setUpdatedAt(OffsetDateTime.now());
         return mapToResponse(repository.save(request));
@@ -123,6 +135,9 @@ public class SkillSwapRequestService {
     public SkillSwapRequestResponseDto reject(Long requestId, Long userId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
+        if (!request.getReceiverId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the receiver can reject the request");
+        }
         request.setStatus(RequestStatus.REJECTED);
         request.setUpdatedAt(OffsetDateTime.now());
         return mapToResponse(repository.save(request));
@@ -132,6 +147,9 @@ public class SkillSwapRequestService {
     public SkillSwapRequestResponseDto cancel(Long requestId, Long userId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
+        if (!request.getSenderId().equals(userId) && !request.getReceiverId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only participants can cancel the request");
+        }
         request.setStatus(RequestStatus.CANCELLED);
         request.setUpdatedAt(OffsetDateTime.now());
         return mapToResponse(repository.save(request));
@@ -141,9 +159,18 @@ public class SkillSwapRequestService {
     public SkillSwapRequestResponseDto complete(Long requestId, Long userId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
+        if (!request.getSenderId().equals(userId) && !request.getReceiverId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only participants can complete the request");
+        }
         request.setStatus(RequestStatus.COMPLETED);
         request.setUpdatedAt(OffsetDateTime.now());
         return mapToResponse(repository.save(request));
+    }
+
+    private void validateTimeWindow(LocalTime startTime, LocalTime endTime) {
+        if (!endTime.isAfter(startTime)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "End time must be after start time");
+        }
     }
 
     private SkillSwapRequestResponseDto mapToResponse(SkillSwapRequest request) {
