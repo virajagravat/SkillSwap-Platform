@@ -5,8 +5,10 @@ import Button from '../ui/Button';
 import Avatar from '../ui/Avatar';
 import Badge from '../ui/Badge';
 import { getProfileByUserId, getProfileSkills, getFullPhotoUrl } from '../../services/profileApi';
+import { useAuth } from '../../contexts/AuthContext';
 
 const UserProfileModal = ({ isOpen, onClose, userId, teacherName, offeredSkillId, offeredSkillName, onSendSwapRequest }) => {
+  const { user } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [userSkills, setUserSkills] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,13 +96,14 @@ const UserProfileModal = ({ isOpen, onClose, userId, teacherName, offeredSkillId
               variant="primary"
               size="sm"
               leftIcon={<Send className="w-4 h-4" />}
+              disabled={user?.id === userId}
               onClick={() => {
                 onClose();
                 onSendSwapRequest?.(profileData?.name || teacherName, offeredSkillName, userId, offeredSkillId);
               }}
               className="shadow-md"
             >
-              Send Swap Request
+              {user?.id === userId ? 'Your Profile' : 'Send Swap Request'}
             </Button>
           </div>
 

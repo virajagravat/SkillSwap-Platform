@@ -129,11 +129,12 @@ const SearchSkillsPage = () => {
       const friendly = (() => {
         if (e.status === 401) return 'Your session has expired. Please log in again.';
         if (e.status === 403) return 'You are not authorised to send this request.';
-        if (e.message.includes('already exists')) return 'You already sent a request to this teacher for this skill.';
-        if (e.message.includes('cannot send to yourself')) return 'You cannot send a request to yourself.';
-        if (e.message.includes('End time must be after start time'))
+        if (e.message?.includes('active skill-swap request') || e.message?.includes('already exists'))
+          return 'You already have an active request to this teacher for this skill.';
+        if (e.message?.includes('cannot send to yourself')) return 'You cannot send a request to yourself.';
+        if (e.message?.includes('End time must be after start time'))
           return 'End time must be after start time.';
-        return 'Unable to send request. Please try again.';
+        return e.message || 'Unable to send request. Please try again.';
       })();
       showToast({ message: friendly, type: 'error', duration: 5000 });
     } finally {
@@ -335,9 +336,11 @@ const SearchSkillsPage = () => {
                     size="sm"
                     className="w-full text-xs font-semibold"
                     leftIcon={<Send className="w-3.5 h-3.5" />}
+                    disabled={user?.id === item.userId}
+                    title={user?.id === item.userId ? 'You cannot send a swap request to yourself' : 'Send Swap Request'}
                     onClick={() => handleSendSwapRequest(item.name, item.skillName, item.userId, item.skillId)}
                   >
-                    Send Swap Request
+                    {user?.id === item.userId ? 'Your Skill' : 'Send Swap Request'}
                   </Button>
                 </div>
               </Card>

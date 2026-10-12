@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service layer containing the core business rules for skill-swap requests.
+ * Service layer containing the core business rules for skill‑swap requests.
  */
 @Service
 @RequiredArgsConstructor
@@ -47,7 +47,7 @@ public class SkillSwapRequestService {
                 dto.getSkillId(),
                 ACTIVE_DUPLICATE_STATUSES
         )) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Duplicate skill-swap request already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have an active skill-swap request for this skill with this user");
         }
 
         validateTimeWindow(dto.getRequestedStartTime(), dto.getRequestedEndTime());
@@ -124,7 +124,7 @@ public class SkillSwapRequestService {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         if (!request.getReceiverId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the receiver can accept the request");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the receiver can accept this request");
         }
         request.setStatus(RequestStatus.ACCEPTED);
         request.setUpdatedAt(OffsetDateTime.now());
@@ -136,7 +136,7 @@ public class SkillSwapRequestService {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         if (!request.getReceiverId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the receiver can reject the request");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the receiver can reject this request");
         }
         request.setStatus(RequestStatus.REJECTED);
         request.setUpdatedAt(OffsetDateTime.now());
@@ -148,7 +148,7 @@ public class SkillSwapRequestService {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         if (!request.getSenderId().equals(userId) && !request.getReceiverId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only participants can cancel the request");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only participants can cancel this request");
         }
         request.setStatus(RequestStatus.CANCELLED);
         request.setUpdatedAt(OffsetDateTime.now());
@@ -160,7 +160,7 @@ public class SkillSwapRequestService {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         if (!request.getSenderId().equals(userId) && !request.getReceiverId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only participants can complete the request");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only participants can complete this request");
         }
         request.setStatus(RequestStatus.COMPLETED);
         request.setUpdatedAt(OffsetDateTime.now());
