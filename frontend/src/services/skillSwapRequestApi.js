@@ -42,15 +42,17 @@ const postJson = async (baseUrl, path, body) => {
   return handleResponse(response);
 };
 
+const shouldFallbackToDirectService = (error) => !error.status || error.status >= 500;
+
 export const createSkillSwapRequest = async (requestData) => {
   const path = '/api/skill-swap-requests';
 
   try {
     return await postJson(GATEWAY_URL, path, requestData);
   } catch (gatewayError) {
-    // A response from the gateway (for example 400, 401, or 409) is a real
-    // application error. Only fall back when the gateway is unavailable.
-    if (gatewayError.status && ![502, 503, 504].includes(gatewayError.status)) {
+    // 4xx responses are real application errors. 5xx responses usually mean
+    // the gateway or service discovery is unhealthy, so try the direct service.
+    if (!shouldFallbackToDirectService(gatewayError)) {
       throw gatewayError;
     }
     console.warn('API Gateway unreachable for Skill Swap Request Service, trying direct port:', gatewayError.message);
@@ -71,7 +73,7 @@ export const getSentRequests = async (senderId) => {
   try {
     return await getJson(GATEWAY_URL, path);
   } catch (err) {
-    if (err.status && ![502, 503, 504].includes(err.status)) throw err;
+    if (!shouldFallbackToDirectService(err)) throw err;
     return getJson(DIRECT_URL, path);
   }
 };
@@ -81,7 +83,7 @@ export const getReceivedRequests = async (receiverId) => {
   try {
     return await getJson(GATEWAY_URL, path);
   } catch (err) {
-    if (err.status && ![502, 503, 504].includes(err.status)) throw err;
+    if (!shouldFallbackToDirectService(err)) throw err;
     return getJson(DIRECT_URL, path);
   }
 };
@@ -91,7 +93,7 @@ export const acceptSwapRequest = async (id, userId) => {
   try {
     return await postJson(GATEWAY_URL, path, {});
   } catch (err) {
-    if (err.status && ![502, 503, 504].includes(err.status)) throw err;
+    if (!shouldFallbackToDirectService(err)) throw err;
     return postJson(DIRECT_URL, path, {});
   }
 };
@@ -101,7 +103,7 @@ export const rejectSwapRequest = async (id, userId) => {
   try {
     return await postJson(GATEWAY_URL, path, {});
   } catch (err) {
-    if (err.status && ![502, 503, 504].includes(err.status)) throw err;
+    if (!shouldFallbackToDirectService(err)) throw err;
     return postJson(DIRECT_URL, path, {});
   }
 };
@@ -111,7 +113,7 @@ export const cancelSwapRequest = async (id, userId) => {
   try {
     return await postJson(GATEWAY_URL, path, {});
   } catch (err) {
-    if (err.status && ![502, 503, 504].includes(err.status)) throw err;
+    if (!shouldFallbackToDirectService(err)) throw err;
     return postJson(DIRECT_URL, path, {});
   }
 };
@@ -121,7 +123,7 @@ export const completeSwapRequest = async (id, userId) => {
   try {
     return await postJson(GATEWAY_URL, path, {});
   } catch (err) {
-    if (err.status && ![502, 503, 504].includes(err.status)) throw err;
+    if (!shouldFallbackToDirectService(err)) throw err;
     return postJson(DIRECT_URL, path, {});
   }
 };
@@ -131,7 +133,7 @@ export const suggestSwapTime = async (id, suggestData, receiverId) => {
   try {
     return await postJson(GATEWAY_URL, path, suggestData);
   } catch (err) {
-    if (err.status && ![502, 503, 504].includes(err.status)) throw err;
+    if (!shouldFallbackToDirectService(err)) throw err;
     return postJson(DIRECT_URL, path, suggestData);
   }
 };
