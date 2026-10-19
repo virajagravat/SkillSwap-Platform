@@ -8,6 +8,7 @@ import java.time.LocalTime;
 
 /**
  * DTO returned to clients representing a skill‑swap request.
+ * Includes optional message from the requester and an optional reject reason.
  */
 @Data
 public class SkillSwapRequestResponseDto {
@@ -19,7 +20,10 @@ public class SkillSwapRequestResponseDto {
     private LocalDate requestedDate;
     private LocalTime requestedStartTime;
     private LocalTime requestedEndTime;
+    /** Optional free‑form message from the requester. */
     private String message;
+    /** Optional reason supplied when the receiver rejects the request. */
+    private String rejectReason;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 }

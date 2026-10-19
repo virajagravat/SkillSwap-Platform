@@ -75,8 +75,9 @@ public class SkillSwapRequestController {
     @PostMapping("/{id}/reject")
     public ResponseEntity<SkillSwapRequestResponseDto> reject(
             @PathVariable Long id,
+            @RequestBody @Validated RejectRequestDto rejectDto,
             @RequestParam Long userId) {
-        return ResponseEntity.ok(service.reject(id, userId));
+        return ResponseEntity.ok(service.reject(id, rejectDto, userId));
     }
 
     @PostMapping("/{id}/cancel")
