@@ -42,11 +42,20 @@ public class SkillSwapRequest {
     private LocalTime proposedStartTime;
     /** Latest end‑time proposed */
     private LocalTime proposedEndTime;
-    /** Current workflow status – stored as plain VARCHAR */
+    /**
+     * Current workflow status – stored as plain VARCHAR.
+     */
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RequestStatus status = RequestStatus.PENDING;
+
+    /**
+     * Optional reason supplied when the receiver rejects the request.
+     * Stored as TEXT to allow a detailed explanation.
+     */
+    @Column(name = "reject_reason", columnDefinition = "TEXT")
+    private String rejectReason;
     /** When the row was first inserted */
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

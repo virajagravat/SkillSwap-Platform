@@ -114,10 +114,11 @@ public class SkillSwapRequestService {
     }
 
     @Transactional
-    public SkillSwapRequestResponseDto reject(Long requestId, Long userId) {
+    public SkillSwapRequestResponseDto reject(Long requestId, RejectRequestDto dto, Long userId) {
         SkillSwapRequest request = repository.findById(requestId)
                 .orElseThrow(() -> new RequestNotFoundException(requestId));
         request.setStatus(RequestStatus.REJECTED);
+        request.setRejectReason(dto.getReason());
         request.setUpdatedAt(OffsetDateTime.now());
         return mapToResponse(repository.save(request));
     }

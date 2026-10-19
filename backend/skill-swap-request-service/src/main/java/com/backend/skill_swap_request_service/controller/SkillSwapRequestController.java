@@ -56,4 +56,43 @@ public class SkillSwapRequestController {
             @RequestParam Long receiverId) {
         return ResponseEntity.ok(service.suggestTime(id, dto, receiverId));
     }
+
+
+    @PostMapping("/{id}/schedule")
+    public ResponseEntity<SkillSwapRequestResponseDto> schedule(
+            @PathVariable Long id,
+            @RequestBody @Validated SuggestTimeDto dto,
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(service.schedule(id, dto, userId));
+    }
+
+    @PostMapping("/{id}/accept")
+    public ResponseEntity<SkillSwapRequestResponseDto> accept(
+            @PathVariable Long id,
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(service.accept(id, userId));
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<SkillSwapRequestResponseDto> reject(
+            @PathVariable Long id,
+            @RequestBody @Validated RejectRequestDto rejectDto,
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(service.reject(id, rejectDto, userId));
+    }
+
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<SkillSwapRequestResponseDto> cancel(
+            @PathVariable Long id,
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(service.cancel(id, userId));
+    }
+
+    @PostMapping("/{id}/complete")
+    public ResponseEntity<SkillSwapRequestResponseDto> complete(
+            @PathVariable Long id,
+            @RequestParam Long userId) {
+        return ResponseEntity.ok(service.complete(id, userId));
+    }
+
 }
