@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
+import java.nio.charset.StandardCharsets;
+
 @Configuration
 public class JwtConfig {
 
@@ -20,7 +22,7 @@ public class JwtConfig {
     public JwtDecoder jwtDecoder() {
 
         SecretKey key = new SecretKeySpec(
-            jwtSecret.getBytes(),
+            jwtSecret.getBytes(StandardCharsets.UTF_8),
             "HmacSHA512"
         );
 

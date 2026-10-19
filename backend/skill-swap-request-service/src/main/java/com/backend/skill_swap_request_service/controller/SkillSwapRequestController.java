@@ -57,6 +57,7 @@ public class SkillSwapRequestController {
         return ResponseEntity.ok(service.suggestTime(id, dto, receiverId));
     }
 
+
     @PostMapping("/{id}/schedule")
     public ResponseEntity<SkillSwapRequestResponseDto> schedule(
             @PathVariable Long id,
@@ -93,4 +94,5 @@ public class SkillSwapRequestController {
             @RequestParam Long userId) {
         return ResponseEntity.ok(service.complete(id, userId));
     }
+
 }
