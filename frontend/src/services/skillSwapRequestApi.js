@@ -88,6 +88,11 @@ export const getReceivedRequests = async (receiverId) => {
   }
 };
 
+// The request service owns this read-only catalog endpoint. The gateway's
+// /api/skills route belongs to profile-service, so query the request service
+// directly to keep the two services' routes isolated.
+export const getRequestServiceSkills = async () => getJson(DIRECT_URL, '/api/skills');
+
 export const acceptSwapRequest = async (id, userId) => {
   const path = `/api/skill-swap-requests/${id}/accept?userId=${userId}`;
   try {

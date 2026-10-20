@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X } from 'lucide-react';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
@@ -65,11 +65,12 @@ export const SwapRequestDialog = ({
     };
     try {
       setIsSubmitting(true);
-      await onConfirm(payload);
-    } finally {
-      setIsSubmitting(false);
+      const result = await onConfirm(payload);
+      if (result === false) return;
       resetForm();
       onClose();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

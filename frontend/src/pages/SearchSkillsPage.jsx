@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, X, ChevronLeft, ChevronRight, Eye, Send, Sparkles, RefreshCw, User } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -125,6 +125,9 @@ const SearchSkillsPage = () => {
         type: 'success',
         duration: 5000,
       });
+      setSwapDialogOpen(false);
+      setSelectedSwap(null);
+      return true;
     } catch (e) {
       const friendly = (() => {
         if (e.status === 401) return 'Your session has expired. Please log in again.';
@@ -137,9 +140,7 @@ const SearchSkillsPage = () => {
         return e.message || 'Unable to send request. Please try again.';
       })();
       showToast({ message: friendly, type: 'error', duration: 5000 });
-    } finally {
-      setSwapDialogOpen(false);
-      setSelectedSwap(null);
+      return false;
     }
   };
 
